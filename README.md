@@ -2,6 +2,7 @@
 
 An AI-powered media recommendation and planning platform designed to help businesses make smarter marketing and media investment decisions based on their business objectives, industry, target audience, budget, location, and expected outcomes.
 
+
 ---
 
 ## 📌 Overview
@@ -671,3 +672,21 @@ my-ai-project/
 ├── .gitignore
 ├── .env
 └── README.md
+## Day 3: Gemini CLI Assistant
+
+The Day 3 lab connects the Python application to the Gemini API.
+
+### What it demonstrates
+
+- Loading an API key securely from `.env`
+- Sending user input to an LLM
+- Receiving an AI-generated response
+- Building a reusable LLM calling function
+- Creating a CLI text-in/text-out assistant
+
+### Run
+
+Make sure the virtual environment is activated:
+
+```powershell
+python scripts\cli_assistant.py
