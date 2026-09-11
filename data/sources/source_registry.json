@@ -1,0 +1,93 @@
+{
+  "sources": [
+    {
+      "source_id": "raj-explore-sectors",
+      "source_name": "Rajasthan Rising - Explore Sectors",
+      "source_type": "official_government",
+      "publisher": "Bureau of Investment Promotion, Government of Rajasthan",
+      "url": "https://rising.rajasthan.gov.in/explore-sectors",
+      "geographic_scope": "Rajasthan",
+      "industries": [
+        "gems_and_jewellery",
+        "handicrafts",
+        "hospitality_and_tourism",
+        "logistics_and_warehousing",
+        "industrial_parks",
+        "solar_and_renewable_energy",
+        "it_services",
+        "marble_and_steel",
+        "agriculture_and_agri_business"
+      ],
+      "topics": [
+        "industry",
+        "sector overview",
+        "investment",
+        "business environment"
+      ],
+      "priority": "high",
+      "use_for": [
+        "industry research",
+        "sector identification",
+        "Rajasthan business context"
+      ]
+    },
+    {
+      "source_id": "raj-renewable-energy",
+      "source_name": "Rajasthan Rising - Renewable Energy",
+      "source_type": "official_government",
+      "publisher": "Bureau of Investment Promotion, Government of Rajasthan",
+      "url": "https://rising.rajasthan.gov.in/renewable-energy",
+      "geographic_scope": "Rajasthan",
+      "industries": [
+        "solar_and_renewable_energy"
+      ],
+      "topics": [
+        "renewable energy",
+        "solar energy",
+        "investment",
+        "policy",
+        "industry growth"
+      ],
+      "priority": "high",
+      "use_for": [
+        "renewable energy research",
+        "solar industry research",
+        "Rajasthan policy context",
+        "investment context"
+      ]
+    },
+    {
+      "source_id": "raj-policy-environment",
+      "source_name": "Rajasthan Rising - Policy Environment",
+      "source_type": "official_government",
+      "publisher": "Bureau of Investment Promotion, Government of Rajasthan",
+      "url": "https://rising.rajasthan.gov.in/policy-environment",
+      "geographic_scope": "Rajasthan",
+      "industries": [
+        "gems_and_jewellery",
+        "handicrafts",
+        "hospitality_and_tourism",
+        "logistics_and_warehousing",
+        "industrial_parks",
+        "solar_and_renewable_energy",
+        "it_services",
+        "marble_and_steel",
+        "agriculture_and_agri_business"
+      ],
+      "topics": [
+        "government policy",
+        "regulation",
+        "incentives",
+        "schemes",
+        "industry policy"
+      ],
+      "priority": "high",
+      "use_for": [
+        "government policy research",
+        "industry incentives",
+        "regulatory context",
+        "business environment"
+      ]
+    }
+  ]
+}
