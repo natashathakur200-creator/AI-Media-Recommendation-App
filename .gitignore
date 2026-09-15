@@ -1,17 +1,26 @@
-.env
-venv/
-__pycache__/
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
 
 # Virtual environment
 venv/
 
 # Environment variables / secrets
 .env
+.env.*
+
+# Runtime data
+data/index.json
+data/sessions.json
+logs/
+outbox/
+inbox/processed/
+inbox/failed/
+
+# Local workspace
+workspace/
 
 # OS files
 .DS_Store
 Thumbs.db
-data/index.json

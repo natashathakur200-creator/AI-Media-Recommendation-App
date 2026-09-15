@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Media Recommendation & Planning</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================== */
+
+        .top-bar {
+            background: #c40000;
+            color: white;
+            padding: 12px 30px;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* =========================
+           HEADER
+        ========================== */
+
+        .header {
+            background: white;
+            padding: 42px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #c40000;
+            font-size: 38px;
+        }
+
+        .header p {
+            margin: 12px 0 0;
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* =========================
+           MAIN CONTAINER
+        ========================== */
+
+        .container {
+            max-width: 1050px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        /* =========================
+           CARD
+        ========================== */
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #c40000;
+            margin-top: 0;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 12px;
+            font-size: 22px;
+        }
+
+        /* =========================
+           FORM
+        ========================== */
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 7px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #d2d2d2;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            background: white;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #c40000;
+            box-shadow: 0 0 0 3px rgba(196, 0, 0, 0.08);
+        }
+
+        textarea {
+            min-height: 95px;
+            resize: vertical;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 28px;
+        }
+
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            opacity: 0.94;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #generate {
+            background: #c40000;
+            color: white;
+            flex: 1;
+        }
+
+        #clear {
+            background: #eeeeee;
+            color: #333;
+            min-width: 110px;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* =========================
+           OUTPUT
+        ========================== */
+
+        #output {
+            margin-top: 25px;
+        }
+
+        .result-summary {
+            background: #fff5f5;
+            border-left: 5px solid #c40000;
+            padding: 22px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .result-summary h2 {
+            margin-top: 0;
+            color: #c40000;
+        }
+
+        .budget-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .overview-item {
+            background: #fafafa;
+            border: 1px solid #e1e1e1;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .overview-item strong {
+            display: block;
+            font-size: 22px;
+            color: #c40000;
+            margin-top: 8px;
+        }
+
+        .media-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: white;
+        }
+
+        .media-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .media-number {
+            background: #c40000;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .media-info {
+            flex: 1;
+        }
+
+        .media-info h3 {
+            margin: 0 0 5px;
+        }
+
+        .media-objective {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .media-budget {
+            font-size: 20px;
+            font-weight: bold;
+            color: #c40000;
+            white-space: nowrap;
+        }
+
+        .media-reason {
+            margin-top: 15px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .budget-bar {
+            background: #eeeeee;
+            height: 8px;
+            border-radius: 5px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .budget-fill {
+            background: #c40000;
+            height: 100%;
+        }
+
+        .result-section {
+            margin-top: 30px;
+        }
+
+        .result-section-heading {
+            color: #c40000;
+            border-bottom: 2px solid #eeeeee;
+            padding-bottom: 9px;
+        }
+
+        .roi-box,
+        .evidence-box,
+        .assumptions-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            background: #fafafa;
+            border: 1px solid #dddddd;
+            line-height: 1.6;
+        }
+
+        .roi-box h3 {
+            margin-top: 0;
+            color: #c40000;
+        }
+
+        .evidence-good {
+            border-left: 5px solid green;
+        }
+
+        .evidence-warning {
+            border-left: 5px solid orange;
+        }
+
+        .evidence-neutral {
+            border-left: 5px solid #888;
+        }
+
+        .recommendation-disclaimer {
+            margin-top: 25px;
+            padding: 16px;
+            background: #f5f5f5;
+            color: #666;
+            font-size: 13px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           LOADING
+        ========================== */
+
+        .loading-result {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            margin: 0 auto 15px;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ddd;
+            border-top: 4px solid #c40000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-result {
+            padding: 20px;
+            background: #fff0f0;
+            color: #b00000;
+            border-radius: 10px;
+        }
+
+        /* =========================
+           AI CHAT
+        ========================== */
+
+        .chat-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            color: #c40000;
+            font-size: 24px;
+        }
+
+        .chat-header p {
+            margin: 5px 0 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .session-badge {
+            background: #fff5f5;
+            color: #c40000;
+            border: 1px solid #f0caca;
+            border-radius: 20px;
+            padding: 7px 12px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .chat-messages {
+            min-height: 180px;
+            max-height: 450px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f8f8;
+            border: 1px solid #e2e2e2;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .chat-empty {
+            text-align: center;
+            color: #888;
+            padding: 55px 20px;
+            font-size: 14px;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .chat-message:last-child {
+            margin-bottom: 0;
+        }
+
+        .user-message {
+            margin-left: auto;
+            background: #c40000;
+            color: white;
+            border-bottom-right-radius: 3px;
+        }
+
+        .assistant-message {
+            margin-right: auto;
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-bottom-left-radius: 3px;
+        }
+
+        .chat-label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .chat-text {
+            white-space: pre-wrap;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        #chatInput {
+            flex: 1;
+            margin: 0;
+        }
+
+        #chatSendButton {
+            background: #c40000;
+            color: white;
+            min-width: 100px;
+        }
+
+        .chat-status {
+            min-height: 20px;
+            margin-top: 8px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 700px) {
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .card,
+            .chat-section {
+                padding: 20px;
+            }
+
+            .grid,
+            .budget-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            .media-card-top {
+                flex-wrap: wrap;
+            }
+
+            .chat-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .chat-input-row {
+                flex-direction: column;
+            }
+
+            #chatSendButton {
+                width: 100%;
+            }
+
+            .chat-message {
+                max-width: 92%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         TOP BAR
+    ========================== -->
+
+    <div class="top-bar">
+        AI MEDIA INTELLIGENCE PLATFORM
+    </div>
+
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <div class="header">
+        <h1>AI Media Recommendation</h1>
+        <p>
+            Build a business-specific, budget-conscious media plan
+            with AI-powered analysis
+        </p>
+    </div>
+
+
+    <div class="container">
+
+        <!-- =========================
+             BUSINESS INPUT FORM
+        ========================== -->
+
+        <div class="card">
+
+            <h2 class="section-title">
+                Business Profile
+            </h2>
+
+            <div class="grid">
+
+                <div>
+                    <label for="industry">
+                        Industry
+                    </label>
+
+                    <select id="industry">
+                        <option value="">Select Industry</option>
+                        <option>Gems & Jewellery</option>
+                        <option>Handicrafts</option>
+                        <option>Hospitality & Tourism</option>
+                        <option>Logistics & Warehousing</option>
+                        <option>Industrial Parks</option>
+                        <option>Solar & Renewable Energy</option>
+                        <option>IT Services</option>
+                        <option>Marble & Steel</option>
+                        <option>Agriculture & Agri-business</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="sub_industry">
+                        Sub-Industry
+                    </label>
+
+                    <input
+                        id="sub_industry"
+                        placeholder="e.g. IT Service Provider"
+                    >
+                </div>
+
+            </div>
+
+
+            <label for="business_name">
+                Business Name
+            </label>
+
+            <input
+                id="business_name"
+                placeholder="Enter business name"
+            >
+
+
+            <div class="grid">
+
+                <div>
+
+                    <label for="business_type">
+                        Business Type
+                    </label>
+
+                    <select id="business_type">
+                        <option value="">Select Type</option>
+                        <option>B2B</option>
+                        <option>B2C</option>
+                        <option>B2B2C</option>
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label for="years_operating">
+                        Years Operating
+                    </label>
+
+                    <select id="years_operating">
+                        <option value="">Select</option>
+                        <option>Less than 1 year</option>
+                        <option>1-3 years</option>
+                        <option>3-5 years</option>
+                        <option>5-10 years</option>
+                        <option>10+ years</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- MARKET -->
+
+            <h2
+                class="section-title"
+                style="margin-top:30px;"
+            >
+                Market & Audience
+            </h2>
+
+
+            <div class="grid">
+
+                <div>
+
+                    <label for="city">
+                        City
+                    </label>
+
+                    <input
+                        id="city"
+                        placeholder="e.g. Jaipur"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label for="state">
+                        State
+                    </label>
+
+                    <input
+                        id="state"
+                        placeholder="e.g. Rajasthan"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <label for="target_audience">
+                Target Audience
+            </label>
+
+            <textarea
+                id="target_audience"
+                placeholder="Describe your target customers, decision makers, age group, location, etc."
+            ></textarea>
+
+
+            <!-- MARKETING -->
+
+            <h2
+                class="section-title"
+                style="margin-top:30px;"
+            >
+                Marketing Requirements
+            </h2>
+
+
+            <label for="marketing_objective">
+                Marketing Objective
+            </label>
+
+            <select id="marketing_objective">
+
+                <option value="">
+                    Select Objective
+                </option>
+
+                <option>Brand Awareness</option>
+                <option>Lead Generation</option>
+                <option>Sales</option>
+                <option>Customer Acquisition</option>
+                <option>Market Expansion</option>
+                <option>Product Launch</option>
+                <option>Customer Retention</option>
+
+            </select>
+
+
+            <div class="grid">
+
+                <div>
+
+                    <label for="marketing_budget_inr">
+                        Marketing Budget (₹)
+                    </label>
+
+                    <input
+                        id="marketing_budget_inr"
+                        type="number"
+                        placeholder="e.g. 100000"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label for="planning_period">
+                        Planning Period
+                    </label>
+
+                    <select id="planning_period">
+
+                        <option>3 months</option>
+                        <option>6 months</option>
+                        <option>12 months</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <label for="current_media_status">
+                Current Media Status
+            </label>
+
+            <textarea
+                id="current_media_status"
+                placeholder="What marketing/media are you currently using?"
+            ></textarea>
+
+
+            <label for="previous_campaign_information">
+                Previous Campaign Information
+            </label>
+
+            <textarea
+                id="previous_campaign_information"
+                placeholder="Mention previous campaigns, results, ROI, leads, etc. If none, write 'First campaign'."
+            ></textarea>
+
+
+            <div class="button-row">
+
+                <button id="generate">
+                    Generate Media Plan
+                </button>
+
+                <button id="clear">
+                    Clear
+                </button>
+
+            </div>
+
+
+            <div id="status"></div>
+
+        </div>
+
+
+        <!-- =========================
+             OUTPUT
+        ========================== -->
+
+        <div id="output"></div>
+
+
+        <!-- =========================
+             AI CHAT
+        ========================== -->
+
+        <div class="chat-section">
+
+            <div class="chat-header">
+
+                <div>
+                    <h2>AI Media Planning Assistant</h2>
+
+                    <p>
+                        Ask follow-up questions about your business,
+                        media plan, budget or campaign strategy.
+                    </p>
+                </div>
+
+                <div class="session-badge">
+                    Conversation memory enabled
+                </div>
+
+            </div>
+
+
+            <div
+                id="chatMessages"
+                class="chat-messages"
+            >
+
+                <div class="chat-empty">
+                    Start a conversation with your AI media planning assistant.
+                </div>
+
+            </div>
+
+
+            <div class="chat-input-row">
+
+                <input
+                    type="text"
+                    id="chatInput"
+                    placeholder="e.g. Which channel should I prioritize for lead generation?"
+                >
+
+                <button
+                    type="button"
+                    id="chatSendButton"
+                >
+                    Send
+                </button>
+
+            </div>
+
+
+            <div
+                id="chatStatus"
+                class="chat-status"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* ==========================================
+           SESSION MEMORY
+        ========================================== */
+
+        const SESSION_ID_KEY =
+            "media_planner_session_id";
+
+        let sessionId =
+            localStorage.getItem(SESSION_ID_KEY);
+
+        if (!sessionId) {
+
+            sessionId =
+                crypto.randomUUID();
+
+            localStorage.setItem(
+                SESSION_ID_KEY,
+                sessionId
+            );
+        }
+
+
+        /* ==========================================
+           ELEMENT REFERENCES
+        ========================================== */
+
+        const generateButton =
+            document.getElementById("generate");
+
+        const clearButton =
+            document.getElementById("clear");
+
+        const statusElement =
+            document.getElementById("status");
+
+        const outputElement =
+            document.getElementById("output");
+
+        const chatInput =
+            document.getElementById("chatInput");
+
+        const chatSendButton =
+            document.getElementById("chatSendButton");
+
+        const chatMessages =
+            document.getElementById("chatMessages");
+
+        const chatStatus =
+            document.getElementById("chatStatus");
+
+
+        /* ==========================================
+           SECURITY / HTML ESCAPING
+        ========================================== */
+
+        function escapeHtml(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+                return "";
+            }
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        /* ==========================================
+           INR FORMATTER
+        ========================================== */
+
+        function formatINR(value) {
+
+            const number =
+                Number(value || 0);
+
+            return new Intl.NumberFormat(
+                "en-IN",
+                {
+                    style: "currency",
+                    currency: "INR",
+                    maximumFractionDigits: 0
+                }
+            ).format(number);
+        }
+
+
+        /* ==========================================
+           LOADING
+        ========================================== */
+
+        function showLoading() {
+
+            outputElement.innerHTML = `
+
+                <div class="card loading-result">
+
+                    <div class="loading-spinner"></div>
+
+                    <h3>
+                        AI is analysing your business...
+                    </h3>
+
+                    <p>
+                        Building your preliminary media recommendation.
+                    </p>
+
+                </div>
+
+            `;
+        }
+
+
+        /* ==========================================
+           MEDIA RECOMMENDATION RENDERER
+        ========================================== */
+
+        function renderRecommendation(data) {
+
+            if (
+                !data ||
+                !data.recommended_media_mix
+            ) {
+
+                outputElement.innerHTML = `
+
+                    <div class="card error-result">
+
+                        The AI returned an unexpected response.
+
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+            const totalBudget =
+                Number(
+                    data.total_recommended_budget_inr || 0
+                );
+
+
+            const mediaMix =
+                data.recommended_media_mix || [];
+
+
+            const planningPeriod =
+                data.planning_period ||
+                "Based on your input";
+
+
+            /* =========================
+               MEDIA MIX
+            ========================== */
+
+            let mediaHTML = "";
+
+
+            mediaMix.forEach(
+                (item, index) => {
+
+                    const budget =
+                        Number(
+                            item.recommended_budget_inr || 0
+                        );
+
+
+                    let percentage =
+                        Number(
+                            item.budget_percentage || 0
+                        );
+
+
+                    if (
+                        !percentage &&
+                        totalBudget > 0
+                    ) {
+
+                        percentage =
+                            (budget / totalBudget) * 100;
+                    }
+
+
+                    mediaHTML += `
+
+                        <div class="media-card">
+
+                            <div class="media-card-top">
+
+                                <div class="media-number">
+                                    ${index + 1}
+                                </div>
+
+                                <div class="media-info">
+
+                                    <h3>
+                                        ${escapeHtml(
+                                            item.media_channel
+                                        )}
+                                    </h3>
+
+                                    <div class="media-objective">
+
+                                        Objective:
+                                        ${escapeHtml(
+                                            item.objective
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+                                <div class="media-budget">
+
+                                    ${formatINR(budget)}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="budget-bar">
+
+                                <div
+                                    class="budget-fill"
+                                    style="
+                                        width:${Math.min(
+                                            percentage,
+                                            100
+                                        )}%;
+                                    "
+                                ></div>
+
+                            </div>
+
+
+                            <p>
+
+                                <strong>
+                                    Budget Allocation:
+                                </strong>
+
+                                ${percentage.toFixed(0)}%
+
+                            </p>
+
+
+                            <div class="media-reason">
+
+                                <strong>
+                                    Role in Plan
+                                </strong>
+
+                                <p>
+                                    ${escapeHtml(
+                                        item.role_in_plan
+                                    )}
+                                </p>
+
+
+                                <strong>
+                                    Why this channel?
+                                </strong>
+
+                                <p>
+                                    ${escapeHtml(
+                                        item.reason
+                                    )}
+                                </p>
+
+
+                                <strong>
+                                    Recommended Activity
+                                </strong>
+
+                                <p>
+                                    ${escapeHtml(
+                                        item.recommended_activity
+                                    )}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    `;
+                }
+            );
+
+
+            /* =========================
+               EXECUTION PLAN
+            ========================== */
+
+            const executionPlan =
+                data.execution_plan || [];
+
+
+            let executionHTML = "";
+
+
+            executionPlan.forEach(
+                (phase, index) => {
+
+                    const actions =
+                        phase.recommended_actions || [];
+
+
+                    executionHTML += `
+
+                        <div class="media-card">
+
+                            <div class="media-card-top">
+
+                                <div class="media-number">
+                                    ${index + 1}
+                                </div>
+
+                                <div class="media-info">
+
+                                    <h3>
+                                        ${escapeHtml(
+                                            phase.phase
+                                        )}
+                                    </h3>
+
+                                    <div class="media-objective">
+
+                                        Focus:
+                                        ${escapeHtml(
+                                            phase.focus
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="media-reason">
+
+                                <strong>
+                                    Recommended Actions
+                                </strong>
+
+                                <ul>
+
+                                    ${
+                                        actions
+                                            .map(
+                                                action =>
+                                                    `<li>${escapeHtml(action)}</li>`
+                                            )
+                                            .join("")
+                                    }
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    `;
+                }
+            );
+
+
+            if (!executionHTML) {
+
+                executionHTML =
+                    "<p>No execution phases provided.</p>";
+            }
+
+
+            /* =========================
+               ROI
+            ========================== */
+
+            const roiScenarios =
+                data.roi_scenarios || [];
+
+
+            let roiHTML = "";
+
+
+            roiScenarios.forEach(
+                scenario => {
+
+                    const assumptions =
+                        scenario.assumptions || [];
+
+
+                    roiHTML += `
+
+                        <div class="roi-box">
+
+                            <h3>
+                                ${escapeHtml(
+                                    scenario.scenario
+                                )}
+                            </h3>
+
+                            <p>
+                                ${escapeHtml(
+                                    scenario.assessment
+                                )}
+                            </p>
+
+                            ${
+                                assumptions.length > 0
+                                    ? `
+
+                                        <strong>
+                                            Key Assumptions
+                                        </strong>
+
+                                        <ul>
+
+                                            ${
+                                                assumptions
+                                                    .map(
+                                                        assumption =>
+                                                            `<li>${escapeHtml(assumption)}</li>`
+                                                    )
+                                                    .join("")
+                                            }
+
+                                        </ul>
+
+                                    `
+                                    : ""
+                            }
+
+                        </div>
+
+                    `;
+                }
+            );
+
+
+            if (!roiHTML) {
+
+                roiHTML = `
+
+                    <div class="roi-box">
+
+                        ${escapeHtml(
+                            data.estimated_roi_note ||
+                            "No ROI scenario information provided."
+                        )}
+
+                    </div>
+
+                `;
+            }
+
+
+            /* =========================
+               ASSUMPTIONS
+            ========================== */
+
+            const assumptions =
+                data.important_assumptions || [];
+
+
+            let assumptionsHTML =
+                "<p>No specific assumptions provided.</p>";
+
+
+            if (assumptions.length > 0) {
+
+                assumptionsHTML = `
+
+                    <ul>
+
+                        ${
+                            assumptions
+                                .map(
+                                    assumption =>
+                                        `<li>${escapeHtml(assumption)}</li>`
+                                )
+                                .join("")
+                        }
+
+                    </ul>
+
+                `;
+            }
+
+
+            /* =========================
+               NEXT STEPS
+            ========================== */
+
+            const nextSteps =
+                data.next_steps || [];
+
+
+            let nextStepsHTML =
+                "<p>No specific next steps provided.</p>";
+
+
+            if (nextSteps.length > 0) {
+
+                nextStepsHTML = `
+
+                    <ol>
+
+                        ${
+                            nextSteps
+                                .map(
+                                    step =>
+                                        `<li>${escapeHtml(step)}</li>`
+                                )
+                                .join("")
+                        }
+
+                    </ol>
+
+                `;
+            }
+
+
+            /* =========================
+               EVIDENCE STATUS
+            ========================== */
+
+            const evidence =
+                String(
+                    data.evidence_status || ""
+                );
+
+
+            let evidenceClass =
+                "evidence-neutral";
+
+
+            const evidenceLower =
+                evidence.toLowerCase();
+
+
+            if (
+                evidenceLower.includes("verified") ||
+                (
+                    evidenceLower.includes("live") &&
+                    !evidenceLower.includes("no live")
+                )
+            ) {
+
+                evidenceClass =
+                    "evidence-good";
+
+            } else if (
+                evidenceLower.includes("not available") ||
+                evidenceLower.includes("limited") ||
+                evidenceLower.includes("no live")
+            ) {
+
+                evidenceClass =
+                    "evidence-warning";
+            }
+
+
+            /* =========================
+               FINAL RESULT
+            ========================== */
+
+            outputElement.innerHTML = `
+
+                <div class="card recommendation-result">
+
+
+                    <div class="result-summary">
+
+                        <h2>
+                            AI Media Plan
+                        </h2>
+
+                        <p>
+                            ${escapeHtml(
+                                data.business_summary
+                            )}
+                        </p>
+
+                    </div>
+
+
+                    <div class="budget-overview">
+
+                        <div class="overview-item">
+
+                            Total Recommended Budget
+
+                            <strong>
+                                ${formatINR(
+                                    totalBudget
+                                )}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="overview-item">
+
+                            Media Channels
+
+                            <strong>
+                                ${mediaMix.length}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="overview-item">
+
+                            Planning Period
+
+                            <strong>
+                                ${escapeHtml(
+                                    planningPeriod
+                                )}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-section">
+
+                        <h2 class="result-section-heading">
+                            Strategic Recommendation
+                        </h2>
+
+                        <div class="roi-box">
+
+                            ${escapeHtml(
+                                data.strategic_recommendation
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-section">
+
+                        <h2 class="result-section-heading">
+                            Recommended Media Mix
+                        </h2>
+
+                        ${mediaHTML}
+
+                    </div>
+
+
+                    <div class="result-section">
+
+                        <h2 class="result-section-heading">
+                            Campaign Execution Plan
+                        </h2>
+
+                        ${executionHTML}
+
+                    </div>
+
+
+                    <div class="result-section">
+
+                        <h2 class="result-section-heading">
+                            ROI & Performance Scenarios
+                        </h2>
+
+                        ${roiHTML}
+
+                        <div class="recommendation-disclaimer">
+
+                            ${escapeHtml(
+                                data.estimated_roi_note ||
+                                "ROI and performance are estimates and are not guaranteed."
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-section">
+
+                        <h2 class="result-section-heading">
+                            Evidence Status
+                        </h2>
+
+                        <div
+                            class="evidence-box ${evidenceClass}"
+                        >
+
+                            ${escapeHtml(
+                                evidence
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-section">
+
+                        <h2 class="result-section-heading">
+                            Important Assumptions
+                        </h2>
+
+                        <div class="assumptions-box">
+
+                            ${assumptionsHTML}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-section">
+
+                        <h2 class="result-section-heading">
+                            Recommended Next Steps
+                        </h2>
+
+                        <div class="assumptions-box">
+
+                            ${nextStepsHTML}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="recommendation-disclaimer">
+
+                        <strong>
+                            Important:
+                        </strong>
+
+                        This is an AI-generated preliminary
+                        media recommendation. Research availability,
+                        estimated ROI, media costs, reach, leads and
+                        campaign performance may vary. No result is
+                        guaranteed. Final media planning should include
+                        verified research, current media rates, campaign
+                        data and professional review.
+
+                    </div>
+
+                </div>
+
+            `;
+        }
+
+
+        /* ==========================================
+           GENERATE MEDIA PLAN
+        ========================================== */
+
+        generateButton.addEventListener(
+            "click",
+            async function () {
+
+                statusElement.textContent =
+                    "Generating recommendation...";
+
+                showLoading();
+
+                generateButton.disabled = true;
+
+
+                const payload = {
+
+                    industry:
+                        document.getElementById(
+                            "industry"
+                        ).value,
+
+                    sub_industry:
+                        document.getElementById(
+                            "sub_industry"
+                        ).value,
+
+                    business_name:
+                        document.getElementById(
+                            "business_name"
+                        ).value,
+
+                    business_type:
+                        document.getElementById(
+                            "business_type"
+                        ).value,
+
+                    years_operating:
+                        document.getElementById(
+                            "years_operating"
+                        ).value,
+
+                    city:
+                        document.getElementById(
+                            "city"
+                        ).value,
+
+                    state:
+                        document.getElementById(
+                            "state"
+                        ).value,
+
+                    target_audience:
+                        document.getElementById(
+                            "target_audience"
+                        ).value,
+
+                    marketing_objective:
+                        document.getElementById(
+                            "marketing_objective"
+                        ).value,
+
+                    marketing_budget_inr:
+                        document.getElementById(
+                            "marketing_budget_inr"
+                        ).value,
+
+                    planning_period:
+                        document.getElementById(
+                            "planning_period"
+                        ).value,
+
+                    current_media_status:
+                        document.getElementById(
+                            "current_media_status"
+                        ).value,
+
+                    previous_campaign_information:
+                        document.getElementById(
+                            "previous_campaign_information"
+                        ).value
+
+                };
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/api/recommend",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        payload
+                                    )
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.detail ||
+                            data.error ||
+                            "Request failed"
+                        );
+                    }
+
+
+                    if (data.ok === false) {
+
+                        throw new Error(
+                            data.error ||
+                            "Unable to generate recommendation."
+                        );
+                    }
+
+
+                    renderRecommendation(
+                        data.recommendation ||
+                        data
+                    );
+
+
+                    statusElement.textContent =
+                        "Recommendation generated successfully.";
+
+                }
+
+                catch (error) {
+
+                    outputElement.innerHTML = `
+
+                        <div class="card error-result">
+
+                            <strong>
+                                Something went wrong.
+                            </strong>
+
+                            <p>
+                                ${escapeHtml(
+                                    error.message
+                                )}
+                            </p>
+
+                        </div>
+
+                    `;
+
+
+                    statusElement.textContent =
+                        "Unable to generate recommendation.";
+
+                }
+
+                finally {
+
+                    generateButton.disabled =
+                        false;
+                }
+
+            }
+        );
+
+
+        /* ==========================================
+           CLEAR BUTTON
+        ========================================== */
+
+        clearButton.addEventListener(
+            "click",
+            function () {
+
+                document
+                    .querySelectorAll(
+                        "input, textarea"
+                    )
+                    .forEach(
+                        element =>
+                            element.value = ""
+                    );
+
+
+                document
+                    .querySelectorAll(
+                        "select"
+                    )
+                    .forEach(
+                        element =>
+                            element.selectedIndex = 0
+                    );
+
+
+                outputElement.innerHTML = "";
+
+                statusElement.textContent = "";
+
+            }
+        );
+
+
+        /* ==========================================
+           GEMINI CHAT
+        ========================================== */
+
+        async function sendChatMessage(message) {
+
+            try {
+
+                chatStatus.textContent =
+                    "AI is thinking...";
+
+                chatSendButton.disabled =
+                    true;
+
+
+                /*
+                 * The current FastAPI endpoint accepts
+                 * session_id and message as parameters.
+                 */
+
+                const url =
+                    `/api/chat?session_id=${encodeURIComponent(
+                        sessionId
+                    )}&message=${encodeURIComponent(
+                        message
+                    )}`;
+
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method: "POST"
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.detail ||
+                        data.error ||
+                        "Chat request failed."
+                    );
+                }
+
+
+                if (!data.ok) {
+
+                    throw new Error(
+                        data.error ||
+                        "Chat request failed."
+                    );
+                }
+
+
+                return data.answer;
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Chat error:",
+                    error
+                );
+
+                throw error;
+
+            }
+
+            finally {
+
+                chatSendButton.disabled =
+                    false;
+
+                chatStatus.textContent = "";
+            }
+        }
+
+
+        /* ==========================================
+           ADD CHAT MESSAGE
+        ========================================== */
+
+        function addChatMessage(
+            role,
+            message
+        ) {
+
+            const emptyMessage =
+                chatMessages.querySelector(
+                    ".chat-empty"
+                );
+
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+
+
+            const messageElement =
+                document.createElement("div");
+
+
+            messageElement.className =
+                `chat-message ${
+                    role === "user"
+                        ? "user-message"
+                        : "assistant-message"
+                }`;
+
+
+            const label =
+                document.createElement("div");
+
+            label.className =
+                "chat-label";
+
+            label.textContent =
+                role === "user"
+                    ? "You"
+                    : "AI Assistant";
+
+
+            const text =
+                document.createElement("div");
+
+            text.className =
+                "chat-text";
+
+            text.textContent =
+                message;
+
+
+            messageElement.appendChild(
+                label
+            );
+
+            messageElement.appendChild(
+                text
+            );
+
+
+            chatMessages.appendChild(
+                messageElement
+            );
+
+
+            chatMessages.scrollTop =
+                chatMessages.scrollHeight;
+        }
+
+
+        /* ==========================================
+           SEND CHAT MESSAGE
+        ========================================== */
+
+        async function handleChatSend() {
+
+            const message =
+                chatInput.value.trim();
+
+
+            if (!message) {
+                return;
+            }
+
+
+            addChatMessage(
+                "user",
+                message
+            );
+
+
+            chatInput.value = "";
+
+
+            try {
+
+                const answer =
+                    await sendChatMessage(
+                        message
+                    );
+
+
+                addChatMessage(
+                    "assistant",
+                    answer
+                );
+
+            }
+
+            catch (error) {
+
+                addChatMessage(
+                    "assistant",
+                    "Sorry, I couldn't process that message. Please try again."
+                );
+
+            }
+
+        }
+
+
+        chatSendButton.addEventListener(
+            "click",
+            handleChatSend
+        );
+
+
+        /* ==========================================
+           ENTER KEY FOR CHAT
+        ========================================== */
+
+        chatInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    handleChatSend();
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
