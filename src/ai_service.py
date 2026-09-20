@@ -1,4 +1,5 @@
 import json
+import ast
 import os
 
 from dotenv import load_dotenv
@@ -762,21 +763,31 @@ Return ONLY the required JSON object.
     )
 
     try:
+        cleaned_response = raw_response.strip()
 
-        result = json.loads(
-            raw_response
-        )
+        # First choice: strict JSON.
+        try:
+            result = json.loads(cleaned_response)
 
-    except json.JSONDecodeError as error:
+        except json.JSONDecodeError:
+            # Gemini can occasionally return a Python-style dictionary.
+            result = ast.literal_eval(cleaned_response)
 
+        if not isinstance(result, dict):
+            raise ValueError(
+                "Gemini response must be a JSON object."
+            )
+
+    except (json.JSONDecodeError, SyntaxError, ValueError) as error:
         raise ValueError(
-            f"Gemini returned invalid JSON: {error}"
+            f"Gemini returned invalid structured output: {error}"
         ) from error
 
     return normalize_recommendation(
         result,
         business_data
     )
+
 
 
 # =========================================================
