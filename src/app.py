@@ -59,6 +59,10 @@ def startup_event():
 def home():
     return FileResponse("web/index.html")
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 
 @app.post("/api/recommend")
 def recommend(request: BusinessRequest):
