@@ -1,0 +1,8 @@
+Refunds are allowed within 14 days of purchase.
+
+Onboarding steps:
+1. Create an account.
+2. Verify email.
+3. Complete profile.
+
+Support email: support@example.com

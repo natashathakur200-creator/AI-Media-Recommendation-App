@@ -1,2106 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AI Media Recommendation & Planning</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f5f6f8;
-            color: #222;
-        }
-
-        /* =========================
-           TOP BAR
-        ========================== */
-
-        .top-bar {
-            background: #c40000;
-            color: white;
-            padding: 12px 30px;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        /* =========================
-           HEADER
-        ========================== */
-
-        .header {
-            background: white;
-            padding: 42px 20px;
-            text-align: center;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .header h1 {
-            margin: 0;
-            color: #c40000;
-            font-size: 38px;
-        }
-
-        .header p {
-            margin: 12px 0 0;
-            color: #666;
-            font-size: 16px;
-        }
-
-        /* =========================
-           MAIN CONTAINER
-        ========================== */
-
-        .container {
-            max-width: 1050px;
-            margin: 35px auto;
-            padding: 0 20px;
-        }
-
-        /* =========================
-           CARD
-        ========================== */
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-            margin-bottom: 25px;
-        }
-
-        .section-title {
-            color: #c40000;
-            margin-top: 0;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 12px;
-            font-size: 22px;
-        }
-
-        /* =========================
-           FORM
-        ========================== */
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-top: 18px;
-            margin-bottom: 7px;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 13px 14px;
-            border: 1px solid #d2d2d2;
-            border-radius: 8px;
-            font-size: 15px;
-            font-family: inherit;
-            outline: none;
-            background: white;
-            transition: border 0.2s, box-shadow 0.2s;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: #c40000;
-            box-shadow: 0 0 0 3px rgba(196, 0, 0, 0.08);
-        }
-
-        textarea {
-            min-height: 95px;
-            resize: vertical;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .button-row {
-            display: flex;
-            gap: 15px;
-            margin-top: 28px;
-        }
-
-        button {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            transform: translateY(-1px);
-            opacity: 0.94;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        #generate {
-            background: #c40000;
-            color: white;
-            flex: 1;
-        }
-
-        #clear {
-            background: #eeeeee;
-            color: #333;
-            min-width: 110px;
-        }
-
-        #status {
-            margin-top: 15px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        /* =========================
-           OUTPUT
-        ========================== */
-
-        #output {
-            margin-top: 25px;
-        }
-
-        .result-summary {
-            background: #fff5f5;
-            border-left: 5px solid #c40000;
-            padding: 22px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-
-        .result-summary h2 {
-            margin-top: 0;
-            color: #c40000;
-        }
-
-        .budget-overview {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .overview-item {
-            background: #fafafa;
-            border: 1px solid #e1e1e1;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .overview-item strong {
-            display: block;
-            font-size: 22px;
-            color: #c40000;
-            margin-top: 8px;
-        }
-
-        .media-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            background: white;
-        }
-
-        .media-card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .media-number {
-            background: #c40000;
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        .media-info {
-            flex: 1;
-        }
-
-        .media-info h3 {
-            margin: 0 0 5px;
-        }
-
-        .media-objective {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .media-budget {
-            font-size: 20px;
-            font-weight: bold;
-            color: #c40000;
-            white-space: nowrap;
-        }
-
-        .media-reason {
-            margin-top: 15px;
-            line-height: 1.6;
-            color: #444;
-        }
-
-        .budget-bar {
-            background: #eeeeee;
-            height: 8px;
-            border-radius: 5px;
-            margin-top: 15px;
-            overflow: hidden;
-        }
-
-        .budget-fill {
-            background: #c40000;
-            height: 100%;
-        }
-
-        .result-section {
-            margin-top: 30px;
-        }
-
-        .result-section-heading {
-            color: #c40000;
-            border-bottom: 2px solid #eeeeee;
-            padding-bottom: 9px;
-        }
-
-        .roi-box,
-        .evidence-box,
-        .assumptions-box {
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 15px;
-            background: #fafafa;
-            border: 1px solid #dddddd;
-            line-height: 1.6;
-        }
-
-        .roi-box h3 {
-            margin-top: 0;
-            color: #c40000;
-        }
-
-        .evidence-good {
-            border-left: 5px solid green;
-        }
-
-        .evidence-warning {
-            border-left: 5px solid orange;
-        }
-
-        .evidence-neutral {
-            border-left: 5px solid #888;
-        }
-
-        .recommendation-disclaimer {
-            margin-top: 25px;
-            padding: 16px;
-            background: #f5f5f5;
-            color: #666;
-            font-size: 13px;
-            border-radius: 8px;
-            line-height: 1.5;
-        }
-
-        /* =========================
-           LOADING
-        ========================== */
-
-        .loading-result {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .loading-spinner {
-            margin: 0 auto 15px;
-            width: 40px;
-            height: 40px;
-            border: 4px solid #ddd;
-            border-top: 4px solid #c40000;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .error-result {
-            padding: 20px;
-            background: #fff0f0;
-            color: #b00000;
-            border-radius: 10px;
-        }
-
-        /* =========================
-           AI CHAT
-        ========================== */
-
-        .chat-section {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-            margin-top: 30px;
-            margin-bottom: 40px;
-        }
-
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .chat-header h2 {
-            margin: 0;
-            color: #c40000;
-            font-size: 24px;
-        }
-
-        .chat-header p {
-            margin: 5px 0 0;
-            color: #777;
-            font-size: 14px;
-        }
-
-        .session-badge {
-            background: #fff5f5;
-            color: #c40000;
-            border: 1px solid #f0caca;
-            border-radius: 20px;
-            padding: 7px 12px;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-
-        .chat-messages {
-            min-height: 180px;
-            max-height: 450px;
-            overflow-y: auto;
-            padding: 15px;
-            background: #f8f8f8;
-            border: 1px solid #e2e2e2;
-            border-radius: 12px;
-            margin-bottom: 15px;
-        }
-
-        .chat-empty {
-            text-align: center;
-            color: #888;
-            padding: 55px 20px;
-            font-size: 14px;
-        }
-
-        .chat-message {
-            max-width: 80%;
-            padding: 12px 15px;
-            margin-bottom: 12px;
-            border-radius: 12px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        .chat-message:last-child {
-            margin-bottom: 0;
-        }
-
-        .user-message {
-            margin-left: auto;
-            background: #c40000;
-            color: white;
-            border-bottom-right-radius: 3px;
-        }
-
-        .assistant-message {
-            margin-right: auto;
-            background: white;
-            color: #333;
-            border: 1px solid #ddd;
-            border-bottom-left-radius: 3px;
-        }
-
-        .chat-label {
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 4px;
-            opacity: 0.8;
-        }
-
-        .chat-text {
-            white-space: pre-wrap;
-        }
-
-        .chat-input-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        #chatInput {
-            flex: 1;
-            margin: 0;
-        }
-
-        #chatSendButton {
-            background: #c40000;
-            color: white;
-            min-width: 100px;
-        }
-
-        .chat-status {
-            min-height: 20px;
-            margin-top: 8px;
-            color: #777;
-            font-size: 13px;
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================== */
-
-        @media (max-width: 700px) {
-
-            .header h1 {
-                font-size: 28px;
-            }
-
-            .card,
-            .chat-section {
-                padding: 20px;
-            }
-
-            .grid,
-            .budget-overview {
-                grid-template-columns: 1fr;
-            }
-
-            .button-row {
-                flex-direction: column;
-            }
-
-            .media-card-top {
-                flex-wrap: wrap;
-            }
-
-            .chat-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .chat-input-row {
-                flex-direction: column;
-            }
-
-            #chatSendButton {
-                width: 100%;
-            }
-
-            .chat-message {
-                max-width: 92%;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Media Planner — Media Intelligence</title>
+<style>
+:root{
+  --red:#c40000;--red2:#e11d2e;--ink:#171717;--muted:#737373;--line:#e9e9e9;
+  --bg:#f6f7f9;--card:#fff;--soft:#fff4f4;--green:#16834b;--amber:#b56a00;
+  --shadow:0 12px 35px rgba(22,22,22,.07);--radius:18px
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:238px;background:#fff;border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;z-index:20}
+.brand{display:flex;align-items:center;gap:11px;padding:4px 8px 28px}
+.brand-mark{width:39px;height:39px;border-radius:12px;background:linear-gradient(135deg,var(--red),#8e0000);color:#fff;display:grid;place-items:center;font-weight:900;font-size:18px;box-shadow:0 8px 20px rgba(196,0,0,.2)}
+.brand strong{font-size:15px;letter-spacing:-.2px}.brand span{display:block;color:#999;font-size:10px;margin-top:2px}
+.nav-title{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:#aaa;padding:0 10px 8px}
+.nav button{width:100%;border:0;background:transparent;color:#555;text-align:left;padding:11px 12px;border-radius:11px;margin:2px 0;display:flex;align-items:center;gap:10px;font-size:13px}
+.nav button:hover,.nav button.active{background:#fff1f1;color:var(--red);font-weight:700}
+.nav-icon{width:20px;text-align:center;font-size:15px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:14px}
+.live-pill{display:flex;align-items:center;gap:8px;color:#666;font-size:11px;padding:8px}.dot{width:7px;height:7px;background:#18a45c;border-radius:50%;box-shadow:0 0 0 4px #e5f7ed}
+.main{margin-left:238px;width:calc(100% - 238px);min-width:0}
+.topbar{height:68px;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;position:sticky;top:0;z-index:10}
+.crumb{font-size:13px;color:#888}.crumb b{color:#222}.top-actions{display:flex;gap:9px;align-items:center}
+.icon-btn,.ghost-btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;color:#555;font-size:12px}.icon-btn:hover,.ghost-btn:hover{border-color:#ccc;background:#fafafa}
+.page{max-width:1220px;margin:0 auto;padding:32px}
+.hero{display:flex;justify-content:space-between;gap:28px;align-items:flex-end;margin-bottom:25px}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--red);font-weight:800}
+.hero h1{font-size:34px;letter-spacing:-1.3px;margin:7px 0 8px}.hero p{margin:0;color:var(--muted);font-size:14px;max-width:680px}
+.hero-stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 17px;min-width:170px;box-shadow:var(--shadow)}.hero-stat small{color:#999;font-size:10px}.hero-stat strong{display:block;margin-top:3px;font-size:19px}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:20px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.form-card{padding:24px}.stepper{display:flex;align-items:center;margin-bottom:26px}.step{display:flex;align-items:center;gap:8px;color:#aaa;font-size:11px;font-weight:700;white-space:nowrap}.step .num{width:28px;height:28px;border:1px solid #ddd;border-radius:50%;display:grid;place-items:center;font-size:11px;background:#fff}.step.active{color:var(--red)}.step.active .num{background:var(--red);border-color:var(--red);color:#fff}.step.done{color:#333}.step.done .num{background:#f0f0f0;color:#333}.step-line{height:1px;background:#e7e7e7;flex:1;margin:0 10px}
+.step-pane{display:none}.step-pane.active{display:block}.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:20px}.section-head h2{font-size:20px;margin:0;letter-spacing:-.4px}.section-head p{font-size:12px;color:#888;margin:5px 0 0}.section-tag{font-size:10px;color:var(--red);background:#fff1f1;padding:7px 10px;border-radius:20px;font-weight:800}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{margin-bottom:16px}.field.full{grid-column:1/-1}.field label{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;color:#444;margin-bottom:7px}.field label span{font-size:10px;color:#aaa;font-weight:500}
+input,select,textarea{width:100%;border:1px solid #ddd;background:#fff;border-radius:11px;padding:12px 13px;color:#222;outline:none;font-size:13px;transition:.2s}input:focus,select:focus,textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(196,0,0,.07)}textarea{min-height:92px;resize:vertical}
+.input-prefix{position:relative}.input-prefix span{position:absolute;left:13px;top:12px;color:#999;font-size:13px}.input-prefix input{padding-left:28px}
+.choice-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.choice{border:1px solid #ddd;background:#fff;border-radius:11px;padding:12px;text-align:center;color:#666;font-size:11px;font-weight:700}.choice.selected{border-color:var(--red);background:#fff3f3;color:var(--red)}
+.form-footer{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:18px;margin-top:8px}.btn{border:0;border-radius:11px;padding:12px 17px;font-size:12px;font-weight:800}.btn-primary{background:linear-gradient(135deg,var(--red),#a80000);color:#fff;box-shadow:0 8px 18px rgba(196,0,0,.18)}.btn-secondary{background:#f2f2f2;color:#444}.btn-primary:hover{transform:translateY(-1px)}
+.side-card{padding:18px}.side-card h3{margin:0 0 4px;font-size:14px}.side-card>p{font-size:11px;color:#888;margin:0 0 16px;line-height:1.5}.mini-feature{display:flex;gap:10px;padding:12px 0;border-top:1px solid var(--line)}.mini-feature:first-of-type{border-top:0}.mini-icon{width:30px;height:30px;border-radius:9px;background:#fff1f1;color:var(--red);display:grid;place-items:center;font-size:13px;flex-shrink:0}.mini-feature strong{display:block;font-size:11px}.mini-feature span{font-size:10px;color:#888;line-height:1.4}
+.tip{margin-top:14px;background:#171717;color:#fff;border-radius:14px;padding:15px}.tip b{font-size:11px}.tip p{font-size:10px;color:#bbb;line-height:1.5;margin:6px 0 0}
+#output{margin-top:22px}.result-shell{padding:24px}.result-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:18px}.result-top h2{margin:4px 0;font-size:24px;letter-spacing:-.7px}.result-top p{margin:0;color:#777;font-size:12px;max-width:680px;line-height:1.5}.status-badge{padding:7px 10px;border-radius:20px;background:#eaf8f0;color:var(--green);font-size:10px;font-weight:800;white-space:nowrap}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin:18px 0}.kpi{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fcfcfc}.kpi small{display:block;color:#999;font-size:9px;text-transform:uppercase;letter-spacing:.7px}.kpi strong{display:block;margin-top:5px;color:#222;font-size:19px}.kpi.red strong{color:var(--red)}
+.result-nav{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow:auto}.result-tab{border:0;background:transparent;padding:11px 12px;color:#888;font-size:11px;font-weight:800;white-space:nowrap;border-bottom:2px solid transparent}.result-tab.active{color:var(--red);border-bottom-color:var(--red)}.result-pane{display:none;padding-top:20px}.result-pane.active{display:block}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.visual-card{border:1px solid var(--line);border-radius:15px;padding:17px;background:#fff}.visual-card h3{font-size:12px;margin:0 0 4px}.visual-card>p{font-size:10px;color:#999;margin:0 0 15px}.donut-wrap{display:flex;align-items:center;gap:22px}.donut{width:165px;height:165px;border-radius:50%;position:relative;background:conic-gradient(#c40000 0deg,#c40000 150deg,#e34251 150deg,#e34251 230deg,#f08b93 230deg,#f08b93 290deg,#f7b9bd 290deg,#f7b9bd 360deg);flex-shrink:0}.donut:after{content:"";position:absolute;inset:34px;background:#fff;border-radius:50%}.donut-center{position:absolute;z-index:1;inset:0;display:grid;place-items:center;text-align:center}.donut-center b{font-size:18px}.donut-center span{font-size:9px;color:#999;display:block}.legend{display:grid;gap:9px;width:100%}.legend-row{display:flex;align-items:center;justify-content:space-between;font-size:10px}.legend-label{display:flex;gap:7px;align-items:center;color:#555}.legend-dot{width:8px;height:8px;border-radius:3px;background:var(--red)}.bar-list{display:grid;gap:12px}.bar-row .bar-label{display:flex;justify-content:space-between;font-size:10px;margin-bottom:5px;color:#555}.bar-track{height:8px;background:#f0f0f0;border-radius:20px;overflow:hidden}.bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--red),#e44b59)}
+.media-list{display:grid;gap:10px}.media-item{border:1px solid var(--line);border-radius:13px;padding:14px}.media-head{display:flex;align-items:center;gap:10px}.media-rank{width:28px;height:28px;border-radius:9px;background:#fff0f0;color:var(--red);display:grid;place-items:center;font-weight:900;font-size:11px}.media-head h3{margin:0;font-size:12px}.media-budget{margin-left:auto;color:var(--red);font-weight:900;font-size:13px}.media-meta{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.tag{background:#f4f4f4;color:#666;border-radius:20px;padding:5px 8px;font-size:9px}.media-item p{font-size:10px;color:#777;line-height:1.5;margin:8px 0 0}.progress{height:7px;background:#eee;border-radius:10px;overflow:hidden;margin-top:10px}.progress i{display:block;height:100%;background:var(--red);border-radius:10px}
+.timeline{display:grid;gap:10px}.phase{display:grid;grid-template-columns:65px 1fr;gap:12px;border:1px solid var(--line);border-radius:13px;padding:14px}.phase-num{font-size:10px;color:var(--red);font-weight:900}.phase h3{margin:0;font-size:12px}.phase p{margin:5px 0 0;color:#777;font-size:10px;line-height:1.5}.phase ul{margin:8px 0 0;padding-left:16px;color:#777;font-size:10px;line-height:1.6}
+.roi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.roi-card{border:1px solid var(--line);border-radius:13px;padding:15px}.roi-card h3{margin:0;color:var(--red);font-size:12px}.roi-card p{font-size:10px;color:#777;line-height:1.5}.plain-box{border:1px solid var(--line);border-radius:13px;padding:15px;font-size:11px;color:#666;line-height:1.6}.plain-box ul,.plain-box ol{margin:6px 0;padding-left:18px}
+.evidence{padding:12px 14px;border-radius:11px;font-size:11px;line-height:1.5}.evidence.good{background:#edf9f2;color:#16633d}.evidence.warn{background:#fff7e9;color:#8b5a00}.evidence.neutral{background:#f4f4f4;color:#666}
+.loading{text-align:center;padding:50px}.spinner{width:42px;height:42px;border:4px solid #eee;border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}@keyframes spin{to{transform:rotate(360deg)}}.loading h3{margin:0 0 5px;font-size:15px}.loading p{margin:0;color:#999;font-size:11px}
+.error{padding:18px;border-radius:13px;background:#fff0f0;color:#a50000;font-size:12px}
+.chat-fab{position:fixed;right:28px;bottom:25px;width:58px;height:58px;border:0;border-radius:50%;background:linear-gradient(135deg,var(--red),#8f0000);color:#fff;box-shadow:0 14px 30px rgba(196,0,0,.3);font-size:21px;z-index:30}.chat-fab span{position:absolute;right:-2px;top:-2px;width:15px;height:15px;background:#18a45c;border:3px solid #fff;border-radius:50%}
+.chat-panel{position:fixed;right:28px;bottom:94px;width:350px;height:500px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 25px 70px rgba(0,0,0,.18);z-index:29;display:none;overflow:hidden}.chat-panel.open{display:flex;flex-direction:column}.chat-head{padding:16px;background:#171717;color:#fff;display:flex;justify-content:space-between;align-items:center}.chat-head strong{font-size:12px}.chat-head span{display:block;color:#aaa;font-size:9px;margin-top:3px}.chat-close{background:transparent;border:0;color:#aaa;font-size:18px}.chat-messages{flex:1;padding:14px;overflow:auto;background:#fafafa}.chat-empty{text-align:center;color:#999;font-size:11px;padding:50px 20px}.chat-message{max-width:84%;padding:10px 12px;border-radius:12px;margin-bottom:9px;font-size:11px;line-height:1.5;white-space:pre-wrap}.user-message{margin-left:auto;background:var(--red);color:#fff;border-bottom-right-radius:3px}.assistant-message{background:#fff;border:1px solid #e2e2e2;border-bottom-left-radius:3px}.chat-label{font-size:9px;font-weight:800;opacity:.7;margin-bottom:3px}.chat-compose{padding:11px;border-top:1px solid var(--line);display:flex;gap:7px}.chat-compose input{margin:0}.chat-compose button{border:0;background:var(--red);color:#fff;border-radius:10px;padding:0 13px;font-weight:800}.chat-status{font-size:9px;color:#999;padding:0 12px 8px}
+.help-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);display:none;place-items:center;z-index:50}.help-modal.open{display:grid}.help-box{background:#fff;width:min(470px,calc(100% - 30px));border-radius:20px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.2)}.help-box h3{margin:0;font-size:17px}.help-box p{font-size:11px;color:#777;line-height:1.5}.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.help-choice{border:1px solid var(--line);background:#fff;border-radius:11px;padding:12px;text-align:left;font-size:10px;color:#555}.help-choice:hover{border-color:var(--red);color:var(--red);background:#fff7f7}
+.mobile-menu{display:none}
+@media(max-width:1050px){.workspace{grid-template-columns:1fr}.side-card{display:none}.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.sidebar{display:none}.main{margin-left:0;width:100%}.mobile-menu{display:block}.topbar{padding:0 17px}.page{padding:20px 14px}.hero{display:block}.hero-stat{margin-top:15px}.grid,.analytics-grid,.roi-grid{grid-template-columns:1fr}.choice-row{grid-template-columns:1fr}.form-card,.result-shell{padding:17px}.stepper{overflow:auto;padding-bottom:5px}.step-line{min-width:25px}.step{font-size:9px}.chat-panel{right:12px;bottom:88px;width:calc(100% - 24px)}.chat-fab{right:17px;bottom:17px}.result-top{display:block}.status-badge{display:inline-block;margin-top:10px}.donut-wrap{display:block}.donut{margin:0 auto 18px}.kpi-grid{grid-template-columns:1fr 1fr}}
+</style>
 </head>
-
 <body>
 
-    <!-- =========================
-         TOP BAR
-    ========================== -->
-
-    <div class="top-bar">
-        AI MEDIA INTELLIGENCE PLATFORM
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">M</div>
+      <div><strong>MediaPilot AI</strong><span>MEDIA INTELLIGENCE</span></div>
     </div>
-
-
-    <!-- =========================
-         HEADER
-    ========================== -->
-
-    <div class="header">
-        <h1>AI Media Recommendation</h1>
-        <p>
-            Build a business-specific, budget-conscious media plan
-            with AI-powered analysis
-        </p>
+    <div class="nav-title">Workspace</div>
+    <div class="nav">
+      <button class="active" onclick="scrollToTop()"><span class="nav-icon">⌂</span>New Media Plan</button>
+      <button onclick="document.getElementById('output').scrollIntoView({behavior:'smooth'})"><span class="nav-icon">◈</span>Latest Plan</button>
+      <button onclick="openHelp()"><span class="nav-icon">?</span>AI Help</button>
     </div>
-
-
-    <div class="container">
-
-        <!-- =========================
-             BUSINESS INPUT FORM
-        ========================== -->
-
-        <div class="card">
-
-            <h2 class="section-title">
-                Business Profile
-            </h2>
-
-            <div class="grid">
-
-                <div>
-                    <label for="industry">
-                        Industry
-                    </label>
-
-                    <select id="industry">
-                        <option value="">Select Industry</option>
-                        <option>Gems & Jewellery</option>
-                        <option>Handicrafts</option>
-                        <option>Hospitality & Tourism</option>
-                        <option>Logistics & Warehousing</option>
-                        <option>Industrial Parks</option>
-                        <option>Solar & Renewable Energy</option>
-                        <option>IT Services</option>
-                        <option>Marble & Steel</option>
-                        <option>Agriculture & Agri-business</option>
-                        <option>Other</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="sub_industry">
-                        Sub-Industry
-                    </label>
-
-                    <input
-                        id="sub_industry"
-                        placeholder="e.g. IT Service Provider"
-                    >
-                </div>
-
-            </div>
-
-
-            <label for="business_name">
-                Business Name
-            </label>
-
-            <input
-                id="business_name"
-                placeholder="Enter business name"
-            >
-
-
-            <div class="grid">
-
-                <div>
-
-                    <label for="business_type">
-                        Business Type
-                    </label>
-
-                    <select id="business_type">
-                        <option value="">Select Type</option>
-                        <option>B2B</option>
-                        <option>B2C</option>
-                        <option>B2B2C</option>
-                    </select>
-
-                </div>
-
-
-                <div>
-
-                    <label for="years_operating">
-                        Years Operating
-                    </label>
-
-                    <select id="years_operating">
-                        <option value="">Select</option>
-                        <option>Less than 1 year</option>
-                        <option>1-3 years</option>
-                        <option>3-5 years</option>
-                        <option>5-10 years</option>
-                        <option>10+ years</option>
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <!-- MARKET -->
-
-            <h2
-                class="section-title"
-                style="margin-top:30px;"
-            >
-                Market & Audience
-            </h2>
-
-
-            <div class="grid">
-
-                <div>
-
-                    <label for="city">
-                        City
-                    </label>
-
-                    <input
-                        id="city"
-                        placeholder="e.g. Jaipur"
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label for="state">
-                        State
-                    </label>
-
-                    <input
-                        id="state"
-                        placeholder="e.g. Rajasthan"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <label for="target_audience">
-                Target Audience
-            </label>
-
-            <textarea
-                id="target_audience"
-                placeholder="Describe your target customers, decision makers, age group, location, etc."
-            ></textarea>
-
-
-            <!-- MARKETING -->
-
-            <h2
-                class="section-title"
-                style="margin-top:30px;"
-            >
-                Marketing Requirements
-            </h2>
-
-
-            <label for="marketing_objective">
-                Marketing Objective
-            </label>
-
-            <select id="marketing_objective">
-
-                <option value="">
-                    Select Objective
-                </option>
-
-                <option>Brand Awareness</option>
-                <option>Lead Generation</option>
-                <option>Sales</option>
-                <option>Customer Acquisition</option>
-                <option>Market Expansion</option>
-                <option>Product Launch</option>
-                <option>Customer Retention</option>
-
-            </select>
-
-
-            <div class="grid">
-
-                <div>
-
-                    <label for="marketing_budget_inr">
-                        Marketing Budget (₹)
-                    </label>
-
-                    <input
-                        id="marketing_budget_inr"
-                        type="number"
-                        placeholder="e.g. 100000"
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label for="planning_period">
-                        Planning Period
-                    </label>
-
-                    <select id="planning_period">
-
-                        <option>3 months</option>
-                        <option>6 months</option>
-                        <option>12 months</option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <label for="current_media_status">
-                Current Media Status
-            </label>
-
-            <textarea
-                id="current_media_status"
-                placeholder="What marketing/media are you currently using?"
-            ></textarea>
-
-
-            <label for="previous_campaign_information">
-                Previous Campaign Information
-            </label>
-
-            <textarea
-                id="previous_campaign_information"
-                placeholder="Mention previous campaigns, results, ROI, leads, etc. If none, write 'First campaign'."
-            ></textarea>
-
-
-            <div class="button-row">
-
-                <button id="generate">
-                    Generate Media Plan
-                </button>
-
-                <button id="clear">
-                    Clear
-                </button>
-
-            </div>
-
-
-            <div id="status"></div>
-
+    <div class="sidebar-bottom">
+      <div class="live-pill"><i class="dot"></i>AI engine connected</div>
+      <button class="nav" style="border:0;background:transparent;width:100%;padding:10px;text-align:left;color:#888;font-size:11px" onclick="clearAll()">↻ Reset workspace</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="crumb"><span class="mobile-menu">☰ &nbsp;</span>Workspace / <b>Media Planner</b></div>
+      <div class="top-actions">
+        <button class="icon-btn" onclick="openHelp()">✦ Help</button>
+        <button class="ghost-btn" onclick="clearAll()">New plan</button>
+      </div>
+    </header>
+
+    <div class="page">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">AI-powered media intelligence</div>
+          <h1>Build a smarter media plan.</h1>
+          <p>Turn your business context, audience and budget into a practical media mix — with visual allocation, execution phases and performance scenarios.</p>
         </div>
+        <div class="hero-stat"><small>PLANNING ENGINE</small><strong>AI + Strategy</strong></div>
+      </section>
 
-
-        <!-- =========================
-             OUTPUT
-        ========================== -->
-
-        <div id="output"></div>
-
-
-        <!-- =========================
-             AI CHAT
-        ========================== -->
-
-        <div class="chat-section">
-
-            <div class="chat-header">
-
-                <div>
-                    <h2>AI Media Planning Assistant</h2>
-
-                    <p>
-                        Ask follow-up questions about your business,
-                        media plan, budget or campaign strategy.
-                    </p>
-                </div>
-
-                <div class="session-badge">
-                    Conversation memory enabled
-                </div>
-
+      <div class="workspace">
+        <section>
+          <div class="card form-card">
+            <div class="stepper">
+              <div class="step active" data-step="1"><span class="num">1</span>Business</div><div class="step-line"></div>
+              <div class="step" data-step="2"><span class="num">2</span>Audience</div><div class="step-line"></div>
+              <div class="step" data-step="3"><span class="num">3</span>Goals</div><div class="step-line"></div>
+              <div class="step" data-step="4"><span class="num">4</span>Budget</div>
             </div>
 
+            <div class="step-pane active" data-pane="1">
+              <div class="section-head"><div><h2>Tell us about the business</h2><p>A few basics help the engine understand your market.</p></div><div class="section-tag">01 / 04</div></div>
+              <div class="grid">
+                <div class="field"><label>Industry</label><select id="industry"><option value="">Select industry</option><option>Gems & Jewellery</option><option>Handicrafts</option><option>Hospitality & Tourism</option><option>Logistics & Warehousing</option><option>Industrial Parks</option><option>Solar & Renewable Energy</option><option>IT Services</option><option>Marble & Steel</option><option>Agriculture & Agri-business</option><option>Other</option></select></div>
+                <div class="field"><label>Sub-industry <span>optional</span></label><input id="sub_industry" placeholder="e.g. IT service provider"></div>
+                <div class="field"><label>Business name</label><input id="business_name" placeholder="Your company / brand"></div>
+                <div class="field"><label>Business type</label><select id="business_type"><option value="">Select type</option><option>B2B</option><option>B2C</option><option>B2B2C</option></select></div>
+                <div class="field"><label>Years operating</label><select id="years_operating"><option value="">Select</option><option>Less than 1 year</option><option>1-3 years</option><option>3-5 years</option><option>5-10 years</option><option>10+ years</option></select></div>
+              </div>
+            </div>
 
-            <div
-                id="chatMessages"
-                class="chat-messages"
-            >
+            <div class="step-pane" data-pane="2">
+              <div class="section-head"><div><h2>Define the market</h2><p>Where are you selling and who needs to hear from you?</p></div><div class="section-tag">02 / 04</div></div>
+              <div class="grid">
+                <div class="field"><label>City</label><input id="city" placeholder="e.g. Jaipur"></div>
+                <div class="field"><label>State</label><input id="state" placeholder="e.g. Rajasthan"></div>
+                <div class="field full"><label>Target audience</label><textarea id="target_audience" placeholder="Describe customers, decision makers, age group, geography, business segment, etc."></textarea></div>
+              </div>
+            </div>
 
-                <div class="chat-empty">
-                    Start a conversation with your AI media planning assistant.
+            <div class="step-pane" data-pane="3">
+              <div class="section-head"><div><h2>Set the marketing direction</h2><p>Choose the primary outcome the media plan should support.</p></div><div class="section-tag">03 / 04</div></div>
+              <div class="field"><label>Primary marketing objective</label>
+                <div class="choice-row" id="objectiveChoices">
+                  <button class="choice" data-value="Brand Awareness">Awareness</button><button class="choice" data-value="Lead Generation">Leads</button><button class="choice" data-value="Sales">Sales</button><button class="choice" data-value="Customer Acquisition">Acquisition</button><button class="choice" data-value="Market Expansion">Expansion</button><button class="choice" data-value="Product Launch">Launch</button>
                 </div>
-
+                <select id="marketing_objective" style="display:none"><option value="">Select</option><option>Brand Awareness</option><option>Lead Generation</option><option>Sales</option><option>Customer Acquisition</option><option>Market Expansion</option><option>Product Launch</option><option>Customer Retention</option></select>
+              </div>
             </div>
 
-
-            <div class="chat-input-row">
-
-                <input
-                    type="text"
-                    id="chatInput"
-                    placeholder="e.g. Which channel should I prioritize for lead generation?"
-                >
-
-                <button
-                    type="button"
-                    id="chatSendButton"
-                >
-                    Send
-                </button>
-
+            <div class="step-pane" data-pane="4">
+              <div class="section-head"><div><h2>Set the investment envelope</h2><p>Give the engine the budget and current media context.</p></div><div class="section-tag">04 / 04</div></div>
+              <div class="grid">
+                <div class="field"><label>Marketing budget <span>INR</span></label><div class="input-prefix"><span>₹</span><input id="marketing_budget_inr" type="number" placeholder="e.g. 100000"></div></div>
+                <div class="field"><label>Planning period</label><select id="planning_period"><option>3 months</option><option>6 months</option><option>12 months</option></select></div>
+                <div class="field full"><label>Current media status <span>optional</span></label><textarea id="current_media_status" placeholder="What are you currently using? Social, print, outdoor, events, referrals, etc."></textarea></div>
+                <div class="field full"><label>Previous campaign information <span>optional</span></label><textarea id="previous_campaign_information" placeholder="Campaigns, results, ROI, leads, learnings. If none, write First campaign."></textarea></div>
+              </div>
             </div>
 
+            <div class="form-footer">
+              <button class="btn btn-secondary" id="prevBtn" style="visibility:hidden">← Back</button>
+              <div style="display:flex;gap:8px"><button class="btn btn-secondary" id="clear">Clear</button><button class="btn btn-primary" id="nextBtn">Continue →</button></div>
+            </div>
+            <div id="status" style="font-size:10px;color:#888;margin-top:10px;min-height:15px"></div>
+          </div>
 
-            <div
-                id="chatStatus"
-                class="chat-status"
-            ></div>
+          <div id="output"></div>
+        </section>
 
-        </div>
-
+        <aside>
+          <div class="card side-card">
+            <h3>What you'll get</h3><p>A compact decision workspace instead of a wall of AI text.</p>
+            <div class="mini-feature"><div class="mini-icon">◔</div><div><strong>Budget map</strong><span>See how the recommendation distributes your investment.</span></div></div>
+            <div class="mini-feature"><div class="mini-icon">↗</div><div><strong>Media mix</strong><span>Understand each channel's role and activity.</span></div></div>
+            <div class="mini-feature"><div class="mini-icon">◎</div><div><strong>Scenarios</strong><span>Review performance assumptions without guaranteed ROI.</span></div></div>
+            <div class="mini-feature"><div class="mini-icon">✓</div><div><strong>Next actions</strong><span>Turn the recommendation into an execution sequence.</span></div></div>
+          </div>
+          <div class="tip"><b>Strategy note</b><p>The AI recommendation is a starting point. Verify current media rates, evidence and campaign data before committing budget.</p></div>
+        </aside>
+      </div>
     </div>
-
-
-    <script>
-
-        /* ==========================================
-           SESSION MEMORY
-        ========================================== */
-
-        const SESSION_ID_KEY =
-            "media_planner_session_id";
-
-        let sessionId =
-            localStorage.getItem(SESSION_ID_KEY);
-
-        if (!sessionId) {
-
-            sessionId =
-                crypto.randomUUID();
-
-            localStorage.setItem(
-                SESSION_ID_KEY,
-                sessionId
-            );
-        }
-
-
-        /* ==========================================
-           ELEMENT REFERENCES
-        ========================================== */
-
-        const generateButton =
-            document.getElementById("generate");
-
-        const clearButton =
-            document.getElementById("clear");
-
-        const statusElement =
-            document.getElementById("status");
-
-        const outputElement =
-            document.getElementById("output");
-
-        const chatInput =
-            document.getElementById("chatInput");
-
-        const chatSendButton =
-            document.getElementById("chatSendButton");
-
-        const chatMessages =
-            document.getElementById("chatMessages");
-
-        const chatStatus =
-            document.getElementById("chatStatus");
-
-
-        /* ==========================================
-           SECURITY / HTML ESCAPING
-        ========================================== */
-
-        function escapeHtml(value) {
-
-            if (
-                value === null ||
-                value === undefined
-            ) {
-                return "";
-            }
-
-            return String(value)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-
-        /* ==========================================
-           INR FORMATTER
-        ========================================== */
-
-        function formatINR(value) {
-
-            const number =
-                Number(value || 0);
-
-            return new Intl.NumberFormat(
-                "en-IN",
-                {
-                    style: "currency",
-                    currency: "INR",
-                    maximumFractionDigits: 0
-                }
-            ).format(number);
-        }
-
-
-        /* ==========================================
-           LOADING
-        ========================================== */
-
-        function showLoading() {
-
-            outputElement.innerHTML = `
-
-                <div class="card loading-result">
-
-                    <div class="loading-spinner"></div>
-
-                    <h3>
-                        AI is analysing your business...
-                    </h3>
-
-                    <p>
-                        Building your preliminary media recommendation.
-                    </p>
-
-                </div>
-
-            `;
-        }
-
-
-        /* ==========================================
-           MEDIA RECOMMENDATION RENDERER
-        ========================================== */
-
-        function renderRecommendation(data) {
-
-            if (
-                !data ||
-                !data.recommended_media_mix
-            ) {
-
-                outputElement.innerHTML = `
-
-                    <div class="card error-result">
-
-                        The AI returned an unexpected response.
-
-                    </div>
-
-                `;
-
-                return;
-            }
-
-
-            const totalBudget =
-                Number(
-                    data.total_recommended_budget_inr || 0
-                );
-
-
-            const mediaMix =
-                data.recommended_media_mix || [];
-
-
-            const planningPeriod =
-                data.planning_period ||
-                "Based on your input";
-
-
-            /* =========================
-               MEDIA MIX
-            ========================== */
-
-            let mediaHTML = "";
-
-
-            mediaMix.forEach(
-                (item, index) => {
-
-                    const budget =
-                        Number(
-                            item.recommended_budget_inr || 0
-                        );
-
-
-                    let percentage =
-                        Number(
-                            item.budget_percentage || 0
-                        );
-
-
-                    if (
-                        !percentage &&
-                        totalBudget > 0
-                    ) {
-
-                        percentage =
-                            (budget / totalBudget) * 100;
-                    }
-
-
-                    mediaHTML += `
-
-                        <div class="media-card">
-
-                            <div class="media-card-top">
-
-                                <div class="media-number">
-                                    ${index + 1}
-                                </div>
-
-                                <div class="media-info">
-
-                                    <h3>
-                                        ${escapeHtml(
-                                            item.media_channel
-                                        )}
-                                    </h3>
-
-                                    <div class="media-objective">
-
-                                        Objective:
-                                        ${escapeHtml(
-                                            item.objective
-                                        )}
-
-                                    </div>
-
-                                </div>
-
-                                <div class="media-budget">
-
-                                    ${formatINR(budget)}
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="budget-bar">
-
-                                <div
-                                    class="budget-fill"
-                                    style="
-                                        width:${Math.min(
-                                            percentage,
-                                            100
-                                        )}%;
-                                    "
-                                ></div>
-
-                            </div>
-
-
-                            <p>
-
-                                <strong>
-                                    Budget Allocation:
-                                </strong>
-
-                                ${percentage.toFixed(0)}%
-
-                            </p>
-
-
-                            <div class="media-reason">
-
-                                <strong>
-                                    Role in Plan
-                                </strong>
-
-                                <p>
-                                    ${escapeHtml(
-                                        item.role_in_plan
-                                    )}
-                                </p>
-
-
-                                <strong>
-                                    Why this channel?
-                                </strong>
-
-                                <p>
-                                    ${escapeHtml(
-                                        item.reason
-                                    )}
-                                </p>
-
-
-                                <strong>
-                                    Recommended Activity
-                                </strong>
-
-                                <p>
-                                    ${escapeHtml(
-                                        item.recommended_activity
-                                    )}
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    `;
-                }
-            );
-
-
-            /* =========================
-               EXECUTION PLAN
-            ========================== */
-
-            const executionPlan =
-                data.execution_plan || [];
-
-
-            let executionHTML = "";
-
-
-            executionPlan.forEach(
-                (phase, index) => {
-
-                    const actions =
-                        phase.recommended_actions || [];
-
-
-                    executionHTML += `
-
-                        <div class="media-card">
-
-                            <div class="media-card-top">
-
-                                <div class="media-number">
-                                    ${index + 1}
-                                </div>
-
-                                <div class="media-info">
-
-                                    <h3>
-                                        ${escapeHtml(
-                                            phase.phase
-                                        )}
-                                    </h3>
-
-                                    <div class="media-objective">
-
-                                        Focus:
-                                        ${escapeHtml(
-                                            phase.focus
-                                        )}
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="media-reason">
-
-                                <strong>
-                                    Recommended Actions
-                                </strong>
-
-                                <ul>
-
-                                    ${
-                                        actions
-                                            .map(
-                                                action =>
-                                                    `<li>${escapeHtml(action)}</li>`
-                                            )
-                                            .join("")
-                                    }
-
-                                </ul>
-
-                            </div>
-
-                        </div>
-
-                    `;
-                }
-            );
-
-
-            if (!executionHTML) {
-
-                executionHTML =
-                    "<p>No execution phases provided.</p>";
-            }
-
-
-            /* =========================
-               ROI
-            ========================== */
-
-            const roiScenarios =
-                data.roi_scenarios || [];
-
-
-            let roiHTML = "";
-
-
-            roiScenarios.forEach(
-                scenario => {
-
-                    const assumptions =
-                        scenario.assumptions || [];
-
-
-                    roiHTML += `
-
-                        <div class="roi-box">
-
-                            <h3>
-                                ${escapeHtml(
-                                    scenario.scenario
-                                )}
-                            </h3>
-
-                            <p>
-                                ${escapeHtml(
-                                    scenario.assessment
-                                )}
-                            </p>
-
-                            ${
-                                assumptions.length > 0
-                                    ? `
-
-                                        <strong>
-                                            Key Assumptions
-                                        </strong>
-
-                                        <ul>
-
-                                            ${
-                                                assumptions
-                                                    .map(
-                                                        assumption =>
-                                                            `<li>${escapeHtml(assumption)}</li>`
-                                                    )
-                                                    .join("")
-                                            }
-
-                                        </ul>
-
-                                    `
-                                    : ""
-                            }
-
-                        </div>
-
-                    `;
-                }
-            );
-
-
-            if (!roiHTML) {
-
-                roiHTML = `
-
-                    <div class="roi-box">
-
-                        ${escapeHtml(
-                            data.estimated_roi_note ||
-                            "No ROI scenario information provided."
-                        )}
-
-                    </div>
-
-                `;
-            }
-
-
-            /* =========================
-               ASSUMPTIONS
-            ========================== */
-
-            const assumptions =
-                data.important_assumptions || [];
-
-
-            let assumptionsHTML =
-                "<p>No specific assumptions provided.</p>";
-
-
-            if (assumptions.length > 0) {
-
-                assumptionsHTML = `
-
-                    <ul>
-
-                        ${
-                            assumptions
-                                .map(
-                                    assumption =>
-                                        `<li>${escapeHtml(assumption)}</li>`
-                                )
-                                .join("")
-                        }
-
-                    </ul>
-
-                `;
-            }
-
-
-            /* =========================
-               NEXT STEPS
-            ========================== */
-
-            const nextSteps =
-                data.next_steps || [];
-
-
-            let nextStepsHTML =
-                "<p>No specific next steps provided.</p>";
-
-
-            if (nextSteps.length > 0) {
-
-                nextStepsHTML = `
-
-                    <ol>
-
-                        ${
-                            nextSteps
-                                .map(
-                                    step =>
-                                        `<li>${escapeHtml(step)}</li>`
-                                )
-                                .join("")
-                        }
-
-                    </ol>
-
-                `;
-            }
-
-
-            /* =========================
-               EVIDENCE STATUS
-            ========================== */
-
-            const evidence =
-                String(
-                    data.evidence_status || ""
-                );
-
-
-            let evidenceClass =
-                "evidence-neutral";
-
-
-            const evidenceLower =
-                evidence.toLowerCase();
-
-
-            if (
-                evidenceLower.includes("verified") ||
-                (
-                    evidenceLower.includes("live") &&
-                    !evidenceLower.includes("no live")
-                )
-            ) {
-
-                evidenceClass =
-                    "evidence-good";
-
-            } else if (
-                evidenceLower.includes("not available") ||
-                evidenceLower.includes("limited") ||
-                evidenceLower.includes("no live")
-            ) {
-
-                evidenceClass =
-                    "evidence-warning";
-            }
-
-
-            /* =========================
-               FINAL RESULT
-            ========================== */
-
-            outputElement.innerHTML = `
-
-                <div class="card recommendation-result">
-
-
-                    <div class="result-summary">
-
-                        <h2>
-                            AI Media Plan
-                        </h2>
-
-                        <p>
-                            ${escapeHtml(
-                                data.business_summary
-                            )}
-                        </p>
-
-                    </div>
-
-
-                    <div class="budget-overview">
-
-                        <div class="overview-item">
-
-                            Total Recommended Budget
-
-                            <strong>
-                                ${formatINR(
-                                    totalBudget
-                                )}
-                            </strong>
-
-                        </div>
-
-
-                        <div class="overview-item">
-
-                            Media Channels
-
-                            <strong>
-                                ${mediaMix.length}
-                            </strong>
-
-                        </div>
-
-
-                        <div class="overview-item">
-
-                            Planning Period
-
-                            <strong>
-                                ${escapeHtml(
-                                    planningPeriod
-                                )}
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="result-section">
-
-                        <h2 class="result-section-heading">
-                            Strategic Recommendation
-                        </h2>
-
-                        <div class="roi-box">
-
-                            ${escapeHtml(
-                                data.strategic_recommendation
-                            )}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="result-section">
-
-                        <h2 class="result-section-heading">
-                            Recommended Media Mix
-                        </h2>
-
-                        ${mediaHTML}
-
-                    </div>
-
-
-                    <div class="result-section">
-
-                        <h2 class="result-section-heading">
-                            Campaign Execution Plan
-                        </h2>
-
-                        ${executionHTML}
-
-                    </div>
-
-
-                    <div class="result-section">
-
-                        <h2 class="result-section-heading">
-                            ROI & Performance Scenarios
-                        </h2>
-
-                        ${roiHTML}
-
-                        <div class="recommendation-disclaimer">
-
-                            ${escapeHtml(
-                                data.estimated_roi_note ||
-                                "ROI and performance are estimates and are not guaranteed."
-                            )}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="result-section">
-
-                        <h2 class="result-section-heading">
-                            Evidence Status
-                        </h2>
-
-                        <div
-                            class="evidence-box ${evidenceClass}"
-                        >
-
-                            ${escapeHtml(
-                                evidence
-                            )}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="result-section">
-
-                        <h2 class="result-section-heading">
-                            Important Assumptions
-                        </h2>
-
-                        <div class="assumptions-box">
-
-                            ${assumptionsHTML}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="result-section">
-
-                        <h2 class="result-section-heading">
-                            Recommended Next Steps
-                        </h2>
-
-                        <div class="assumptions-box">
-
-                            ${nextStepsHTML}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="recommendation-disclaimer">
-
-                        <strong>
-                            Important:
-                        </strong>
-
-                        This is an AI-generated preliminary
-                        media recommendation. Research availability,
-                        estimated ROI, media costs, reach, leads and
-                        campaign performance may vary. No result is
-                        guaranteed. Final media planning should include
-                        verified research, current media rates, campaign
-                        data and professional review.
-
-                    </div>
-
-                </div>
-
-            `;
-        }
-
-
-        /* ==========================================
-           GENERATE MEDIA PLAN
-        ========================================== */
-
-        generateButton.addEventListener(
-            "click",
-            async function () {
-
-                statusElement.textContent =
-                    "Generating recommendation...";
-
-                showLoading();
-
-                generateButton.disabled = true;
-
-
-                const payload = {
-
-                    industry:
-                        document.getElementById(
-                            "industry"
-                        ).value,
-
-                    sub_industry:
-                        document.getElementById(
-                            "sub_industry"
-                        ).value,
-
-                    business_name:
-                        document.getElementById(
-                            "business_name"
-                        ).value,
-
-                    business_type:
-                        document.getElementById(
-                            "business_type"
-                        ).value,
-
-                    years_operating:
-                        document.getElementById(
-                            "years_operating"
-                        ).value,
-
-                    city:
-                        document.getElementById(
-                            "city"
-                        ).value,
-
-                    state:
-                        document.getElementById(
-                            "state"
-                        ).value,
-
-                    target_audience:
-                        document.getElementById(
-                            "target_audience"
-                        ).value,
-
-                    marketing_objective:
-                        document.getElementById(
-                            "marketing_objective"
-                        ).value,
-
-                    marketing_budget_inr:
-                        document.getElementById(
-                            "marketing_budget_inr"
-                        ).value,
-
-                    planning_period:
-                        document.getElementById(
-                            "planning_period"
-                        ).value,
-
-                    current_media_status:
-                        document.getElementById(
-                            "current_media_status"
-                        ).value,
-
-                    previous_campaign_information:
-                        document.getElementById(
-                            "previous_campaign_information"
-                        ).value
-
-                };
-
-
-                try {
-
-                    const response =
-                        await fetch(
-                            "/api/recommend",
-                            {
-                                method: "POST",
-
-                                headers: {
-                                    "Content-Type":
-                                        "application/json"
-                                },
-
-                                body:
-                                    JSON.stringify(
-                                        payload
-                                    )
-                            }
-                        );
-
-
-                    const data =
-                        await response.json();
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            data.detail ||
-                            data.error ||
-                            "Request failed"
-                        );
-                    }
-
-
-                    if (data.ok === false) {
-
-                        throw new Error(
-                            data.error ||
-                            "Unable to generate recommendation."
-                        );
-                    }
-
-
-                    renderRecommendation(
-                        data.recommendation ||
-                        data
-                    );
-
-
-                    statusElement.textContent =
-                        "Recommendation generated successfully.";
-
-                }
-
-                catch (error) {
-
-                    outputElement.innerHTML = `
-
-                        <div class="card error-result">
-
-                            <strong>
-                                Something went wrong.
-                            </strong>
-
-                            <p>
-                                ${escapeHtml(
-                                    error.message
-                                )}
-                            </p>
-
-                        </div>
-
-                    `;
-
-
-                    statusElement.textContent =
-                        "Unable to generate recommendation.";
-
-                }
-
-                finally {
-
-                    generateButton.disabled =
-                        false;
-                }
-
-            }
-        );
-
-
-        /* ==========================================
-           CLEAR BUTTON
-        ========================================== */
-
-        clearButton.addEventListener(
-            "click",
-            function () {
-
-                document
-                    .querySelectorAll(
-                        "input, textarea"
-                    )
-                    .forEach(
-                        element =>
-                            element.value = ""
-                    );
-
-
-                document
-                    .querySelectorAll(
-                        "select"
-                    )
-                    .forEach(
-                        element =>
-                            element.selectedIndex = 0
-                    );
-
-
-                outputElement.innerHTML = "";
-
-                statusElement.textContent = "";
-
-            }
-        );
-
-
-        /* ==========================================
-           GEMINI CHAT
-        ========================================== */
-
-        async function sendChatMessage(message) {
-
-            try {
-
-                chatStatus.textContent =
-                    "AI is thinking...";
-
-                chatSendButton.disabled =
-                    true;
-
-
-                /*
-                 * The current FastAPI endpoint accepts
-                 * session_id and message as parameters.
-                 */
-
-                const url =
-                    `/api/chat?session_id=${encodeURIComponent(
-                        sessionId
-                    )}&message=${encodeURIComponent(
-                        message
-                    )}`;
-
-
-                const response =
-                    await fetch(
-                        url,
-                        {
-                            method: "POST"
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        data.detail ||
-                        data.error ||
-                        "Chat request failed."
-                    );
-                }
-
-
-                if (!data.ok) {
-
-                    throw new Error(
-                        data.error ||
-                        "Chat request failed."
-                    );
-                }
-
-
-                return data.answer;
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Chat error:",
-                    error
-                );
-
-                throw error;
-
-            }
-
-            finally {
-
-                chatSendButton.disabled =
-                    false;
-
-                chatStatus.textContent = "";
-            }
-        }
-
-
-        /* ==========================================
-           ADD CHAT MESSAGE
-        ========================================== */
-
-        function addChatMessage(
-            role,
-            message
-        ) {
-
-            const emptyMessage =
-                chatMessages.querySelector(
-                    ".chat-empty"
-                );
-
-            if (emptyMessage) {
-                emptyMessage.remove();
-            }
-
-
-            const messageElement =
-                document.createElement("div");
-
-
-            messageElement.className =
-                `chat-message ${
-                    role === "user"
-                        ? "user-message"
-                        : "assistant-message"
-                }`;
-
-
-            const label =
-                document.createElement("div");
-
-            label.className =
-                "chat-label";
-
-            label.textContent =
-                role === "user"
-                    ? "You"
-                    : "AI Assistant";
-
-
-            const text =
-                document.createElement("div");
-
-            text.className =
-                "chat-text";
-
-            text.textContent =
-                message;
-
-
-            messageElement.appendChild(
-                label
-            );
-
-            messageElement.appendChild(
-                text
-            );
-
-
-            chatMessages.appendChild(
-                messageElement
-            );
-
-
-            chatMessages.scrollTop =
-                chatMessages.scrollHeight;
-        }
-
-
-        /* ==========================================
-           SEND CHAT MESSAGE
-        ========================================== */
-
-        async function handleChatSend() {
-
-            const message =
-                chatInput.value.trim();
-
-
-            if (!message) {
-                return;
-            }
-
-
-            addChatMessage(
-                "user",
-                message
-            );
-
-
-            chatInput.value = "";
-
-
-            try {
-
-                const answer =
-                    await sendChatMessage(
-                        message
-                    );
-
-
-                addChatMessage(
-                    "assistant",
-                    answer
-                );
-
-            }
-
-            catch (error) {
-
-                addChatMessage(
-                    "assistant",
-                    "Sorry, I couldn't process that message. Please try again."
-                );
-
-            }
-
-        }
-
-
-        chatSendButton.addEventListener(
-            "click",
-            handleChatSend
-        );
-
-
-        /* ==========================================
-           ENTER KEY FOR CHAT
-        ========================================== */
-
-        chatInput.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (
-                    event.key === "Enter" &&
-                    !event.shiftKey
-                ) {
-
-                    event.preventDefault();
-
-                    handleChatSend();
-                }
-
-            }
-        );
-
-    </script>
-
+  </main>
+</div>
+
+<button class="chat-fab" id="chatFab" aria-label="Open AI assistant">✦<span></span></button>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head"><div><strong>AI Planning Assistant</strong><span>Ask about your plan, budget or channels</span></div><button class="chat-close" id="chatClose">×</button></div>
+  <div class="chat-messages" id="chatMessages"><div class="chat-empty">Your planning assistant is ready.<br><br>Try: “Which channel should I prioritize for lead generation?”</div></div>
+  <div class="chat-status" id="chatStatus"></div>
+  <div class="chat-compose"><input id="chatInput" placeholder="Ask a question…"><button id="chatSendButton">Send</button></div>
+</div>
+
+<div class="help-modal" id="helpModal">
+  <div class="help-box">
+    <div style="display:flex;justify-content:space-between;gap:15px"><div><div class="eyebrow">Quick help</div><h3>What would you like to understand?</h3></div><button class="icon-btn" onclick="closeHelp()">×</button></div>
+    <p>Use these shortcuts to understand the planning workflow without leaving the screen.</p>
+    <div class="help-grid">
+      <button class="help-choice" onclick="helpAsk('What information should I enter to get a useful media plan?')">What should I enter?</button>
+      <button class="help-choice" onclick="helpAsk('How does the AI decide the media mix?')">How is the mix decided?</button>
+      <button class="help-choice" onclick="helpAsk('How should I interpret the ROI scenarios?')">How do ROI scenarios work?</button>
+      <button class="help-choice" onclick="helpAsk('What should I verify before spending money?')">What should I verify?</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SESSION_ID_KEY="media_planner_session_id";
+let sessionId=localStorage.getItem(SESSION_ID_KEY)||crypto.randomUUID();
+localStorage.setItem(SESSION_ID_KEY,sessionId);
+
+const $=id=>document.getElementById(id);
+const escapeHtml=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+const formatINR=v=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(Number(v||0));
+let currentStep=1;
+
+function scrollToTop(){window.scrollTo({top:0,behavior:"smooth"})}
+function setStep(n){
+  currentStep=Math.max(1,Math.min(4,n));
+  document.querySelectorAll(".step").forEach(x=>{let s=Number(x.dataset.step);x.classList.toggle("active",s===currentStep);x.classList.toggle("done",s<currentStep)});
+  document.querySelectorAll(".step-pane").forEach(x=>x.classList.toggle("active",Number(x.dataset.pane)===currentStep));
+  $("prevBtn").style.visibility=currentStep===1?"hidden":"visible";
+  $("nextBtn").textContent=currentStep===4?"✦ Generate Media Plan":"Continue →";
+}
+$("nextBtn").addEventListener("click",()=>{if(currentStep<4)setStep(currentStep+1);else generatePlan()});
+$("prevBtn").addEventListener("click",()=>setStep(currentStep-1));
+
+document.querySelectorAll("#objectiveChoices .choice").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("#objectiveChoices .choice").forEach(x=>x.classList.remove("selected"));
+    btn.classList.add("selected");$("marketing_objective").value=btn.dataset.value;
+  });
+});
+
+function showLoading(){
+  $("output").innerHTML=`<div class="card loading"><div class="spinner"></div><h3>Building your media plan…</h3><p>Analysing business context, budget and media mix.</p></div>`;
+}
+function payload(){
+ return {
+  industry:$("industry").value,sub_industry:$("sub_industry").value,business_name:$("business_name").value,
+  business_type:$("business_type").value,years_operating:$("years_operating").value,city:$("city").value,state:$("state").value,
+  target_audience:$("target_audience").value,marketing_objective:$("marketing_objective").value,marketing_budget_inr:$("marketing_budget_inr").value,
+  planning_period:$("planning_period").value,current_media_status:$("current_media_status").value,previous_campaign_information:$("previous_campaign_information").value
+ };
+}
+async function generatePlan(){
+  $("status").textContent="Generating recommendation…";showLoading();$("nextBtn").disabled=true;
+  try{
+    const r=await fetch("/api/recommend",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload())});
+    const d=await r.json();if(!r.ok||d.ok===false)throw new Error(d.detail||d.error||"Unable to generate recommendation.");
+    renderRecommendation(d.recommendation||d);$("status").textContent="Plan generated successfully.";
+    $("output").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){$("output").innerHTML=`<div class="card error"><b>Something went wrong.</b><br><br>${escapeHtml(e.message)}</div>`;$("status").textContent="Generation failed."}
+  finally{$("nextBtn").disabled=false;setStep(4)}
+}
+
+function mediaMixVisual(mediaMix,total){
+  const colors=["#c40000","#e34251","#f08b93","#f7b9bd","#8d8d8d","#333"];
+  let angle=0,parts=[],legend="";
+  mediaMix.forEach((x,i)=>{
+    let pct=Number(x.budget_percentage||0);if(!pct&&total)pct=Number(x.recommended_budget_inr||0)/total*100;
+    let end=angle+pct*3.6;parts.push(`${colors[i%colors.length]} ${angle}deg ${end}deg`);angle=end;
+    legend+=`<div class="legend-row"><span class="legend-label"><i class="legend-dot" style="background:${colors[i%colors.length]}"></i>${escapeHtml(x.media_channel)}</span><b>${pct.toFixed(0)}%</b></div>`;
+  });
+  if(!parts.length)parts=["#ddd 0deg 360deg"];
+  return `<div class="donut-wrap"><div class="donut" style="background:conic-gradient(${parts.join(",")})"><div class="donut-center"><div><b>${mediaMix.length}</b><span>channels</span></div></div></div><div class="legend">${legend}</div></div>`;
+}
+function mediaBars(mediaMix,total){
+  return `<div class="bar-list">${mediaMix.map(x=>{let b=Number(x.recommended_budget_inr||0),p=total?b/total*100:0;return `<div class="bar-row"><div class="bar-label"><span>${escapeHtml(x.media_channel)}</span><b>${formatINR(b)}</b></div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(p,100)}%"></div></div></div>`}).join("")}</div>`;
+}
+function renderRecommendation(data){
+  const mix=data.recommended_media_mix||[],total=Number(data.total_recommended_budget_inr||0);
+  const exec=data.execution_plan||[],roi=data.roi_scenarios||[],ass=data.important_assumptions||[],steps=data.next_steps||[];
+  const ev=String(data.evidence_status||"");let evClass=ev.toLowerCase().includes("verified")||ev.toLowerCase().includes("live")&&!ev.toLowerCase().includes("no live")?"good":(ev.toLowerCase().includes("limited")||ev.toLowerCase().includes("not available")||ev.toLowerCase().includes("no live"))?"warn":"neutral";
+  const tabs=["Overview","Media Mix","Execution","ROI & Scenarios","Evidence"];
+  $("output").innerHTML=`
+  <div class="card result-shell">
+    <div class="result-top"><div><div class="eyebrow">AI-generated media plan</div><h2>${escapeHtml(data.business_summary||"Your media strategy")}</h2><p>${escapeHtml(data.strategic_recommendation||"A customized preliminary media recommendation based on the information provided.")}</p></div><div class="status-badge">● Ready to review</div></div>
+    <div class="kpi-grid">
+      <div class="kpi red"><small>Total budget</small><strong>${formatINR(total)}</strong></div>
+      <div class="kpi"><small>Channels</small><strong>${mix.length}</strong></div>
+      <div class="kpi"><small>Planning period</small><strong>${escapeHtml(data.planning_period||"—")}</strong></div>
+      <div class="kpi"><small>Evidence</small><strong style="font-size:12px">${escapeHtml(ev||"Not specified")}</strong></div>
+    </div>
+    <div class="result-nav">${tabs.map((t,i)=>`<button class="result-tab ${i===0?"active":""}" data-tab="${i}">${t}</button>`).join("")}</div>
+    <div class="result-pane active" data-result-pane="0">
+      <div class="analytics-grid">
+        <div class="visual-card"><h3>Budget allocation</h3><p>Share of recommended investment by channel.</p>${mediaMixVisual(mix,total)}</div>
+        <div class="visual-card"><h3>Investment by channel</h3><p>Relative allocation across the recommended mix.</p>${mediaBars(mix,total)}</div>
+      </div>
+      <div style="margin-top:14px" class="plain-box"><b>Strategic direction</b><br>${escapeHtml(data.strategic_recommendation||"No additional strategy summary provided.")}</div>
+    </div>
+    <div class="result-pane" data-result-pane="1">
+      <div class="media-list">${mix.length?mix.map((x,i)=>{let b=Number(x.recommended_budget_inr||0),p=Number(x.budget_percentage||0)||total?b/total*100:0;return `<div class="media-item"><div class="media-head"><div class="media-rank">${i+1}</div><h3>${escapeHtml(x.media_channel)}</h3><div class="media-budget">${formatINR(b)}</div></div><div class="media-meta"><span class="tag">${escapeHtml(x.objective||"Channel role")}</span><span class="tag">${p.toFixed(0)}% of budget</span></div><div class="progress"><i style="width:${Math.min(p,100)}%"></i></div><p><b>Role:</b> ${escapeHtml(x.role_in_plan||"—")} &nbsp; <b>Why:</b> ${escapeHtml(x.reason||"—")}</p><p><b>Activity:</b> ${escapeHtml(x.recommended_activity||"—")}</p></div>`}).join(""):"<div class='plain-box'>No media mix was returned.</div>"}</div>
+    </div>
+    <div class="result-pane" data-result-pane="2">
+      <div class="timeline">${exec.length?exec.map((p,i)=>`<div class="phase"><div class="phase-num">PHASE ${i+1}</div><div><h3>${escapeHtml(p.phase||"Execution phase")} <span style="color:#aaa;font-weight:500">· ${escapeHtml(p.focus||"")}</span></h3><ul>${(p.recommended_actions||[]).map(a=>`<li>${escapeHtml(a)}</li>`).join("")}</ul></div></div>`).join(""):"<div class='plain-box'>No execution phases were provided.</div>"}</div>
+    </div>
+    <div class="result-pane" data-result-pane="3">
+      <div class="roi-grid">${roi.length?roi.map(x=>`<div class="roi-card"><h3>${escapeHtml(x.scenario||"Scenario")}</h3><p>${escapeHtml(x.assessment||"No assessment provided.")}</p>${(x.assumptions||[]).length?`<b style="font-size:9px;color:#999">ASSUMPTIONS</b><ul style="font-size:10px;color:#777;padding-left:15px">${x.assumptions.map(a=>`<li>${escapeHtml(a)}</li>`).join("")}</ul>`:""}</div>`).join(""):"<div class='plain-box'>"+escapeHtml(data.estimated_roi_note||"No ROI scenario information provided.")+"</div>"}</div>
+      <div class="plain-box" style="margin-top:12px"><b>Important assumptions</b><ul>${ass.length?ass.map(a=>`<li>${escapeHtml(a)}</li>`).join(""):"<li>No specific assumptions provided.</li>"}</ul><small style="color:#999">ROI and performance figures are estimates, not guarantees.</small></div>
+    </div>
+    <div class="result-pane" data-result-pane="4">
+      <div class="evidence ${evClass}"><b>Evidence status:</b> ${escapeHtml(ev||"Not specified")}</div>
+      <div class="plain-box" style="margin-top:12px"><b>Recommended next steps</b><ol>${steps.length?steps.map(s=>`<li>${escapeHtml(s)}</li>`).join(""):"<li>No specific next steps provided.</li>"}</ol></div>
+      <div class="plain-box" style="margin-top:12px"><b>Review before activation</b><br>Verify current media rates, source evidence, reach assumptions and campaign economics before committing budget.</div>
+    </div>
+  </div>`;
+  document.querySelectorAll(".result-tab").forEach(btn=>btn.addEventListener("click",()=>{let n=Number(btn.dataset.tab);document.querySelectorAll(".result-tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".result-pane").forEach(x=>x.classList.remove("active"));btn.classList.add("active");document.querySelector(`[data-result-pane="${n}"]`).classList.add("active")}));
+}
+
+function clearAll(){
+  document.querySelectorAll("input,textarea").forEach(x=>x.value="");document.querySelectorAll("select").forEach(x=>x.selectedIndex=0);document.querySelectorAll(".choice").forEach(x=>x.classList.remove("selected"));$("output").innerHTML="";$("status").textContent="";setStep(1);scrollToTop();
+}
+$("clear").addEventListener("click",clearAll);
+
+function openHelp(){$("helpModal").classList.add("open")}
+function closeHelp(){$("helpModal").classList.remove("open")}
+$("helpModal").addEventListener("click",e=>{if(e.target.id==="helpModal")closeHelp()});
+function helpAsk(q){closeHelp();$("chatPanel").classList.add("open");$("chatInput").value=q;handleChatSend()}
+
+$("chatFab").addEventListener("click",()=>$("chatPanel").classList.toggle("open"));
+$("chatClose").addEventListener("click",()=>$("chatPanel").classList.remove("open"));
+function addChatMessage(role,message){let empty=document.querySelector(".chat-empty");if(empty)empty.remove();let d=document.createElement("div");d.className=`chat-message ${role==="user"?"user-message":"assistant-message"}`;let l=document.createElement("div");l.className="chat-label";l.textContent=role==="user"?"You":"AI Assistant";let t=document.createElement("div");t.textContent=message;d.append(l,t);$("chatMessages").appendChild(d);$("chatMessages").scrollTop=$("chatMessages").scrollHeight}
+async function handleChatSend(){
+  let msg=$("chatInput").value.trim();if(!msg)return;addChatMessage("user",msg);$("chatInput").value="";$("chatStatus").textContent="AI is thinking…";$("chatSendButton").disabled=true;
+  try{let r=await fetch(`/api/chat?session_id=${encodeURIComponent(sessionId)}&message=${encodeURIComponent(msg)}`,{method:"POST"});let d=await r.json();if(!r.ok||!d.ok)throw new Error(d.detail||d.error||"Chat request failed.");addChatMessage("assistant",d.answer||"");}
+  catch(e){addChatMessage("assistant","Sorry, I couldn't process that message. Please try again.");}
+  finally{$("chatStatus").textContent="";$("chatSendButton").disabled=false}
+}
+$("chatSendButton").addEventListener("click",handleChatSend);$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")handleChatSend()});
+</script>
 </body>
-
 </html>
