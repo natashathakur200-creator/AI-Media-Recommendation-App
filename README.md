@@ -1,3 +1,12 @@
+## 🚀 Live Demo
+
+**Try MediaPilot AI here:** [Launch MediaPilot AI](https://ai-media-recommendation-app.onrender.com)
+
+MediaPilot AI is an AI-powered media recommendation and planning system that helps businesses identify suitable advertising channels, plan marketing budget allocation, and create structured media execution plans based on their business objectives.
+
+> Note: The first request may take a little longer if the free hosting instance has been inactive.
+
+
 # MediaPilot AI — AI-Powered Media Recommendation & Planning
 
 An AI-powered media planning platform that helps businesses make structured marketing and media investment decisions using business context, audience analysis, budget planning, media-mix recommendations, and estimated ROI scenarios.
